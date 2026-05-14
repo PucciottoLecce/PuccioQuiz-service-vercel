@@ -12,8 +12,24 @@
       "dest": "server/index.js"
     },
     {
-      "src": "/(fine|perso|ruota|test|GDPR)",
-      "dest": "/$1.html"
+      "src": "/test",
+      "dest": "/test.html"
+    },
+    {
+      "src": "/ruota",
+      "dest": "/ruota.html"
+    },
+    {
+      "src": "/fine",
+      "dest": "/fine.html"
+    },
+    {
+      "src": "/perso",
+      "dest": "/perso.html"
+    },
+    {
+      "src": "/GDPR",
+      "dest": "/GDPR.html"
     },
     {
       "src": "/",
