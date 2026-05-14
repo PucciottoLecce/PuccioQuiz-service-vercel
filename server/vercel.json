@@ -12,7 +12,11 @@
       "dest": "server/index.js"
     },
     {
-      "src": "/(.*)",
+      "src": "/(fine|perso|ruota|test|GDPR)",
+      "dest": "/$1.html"
+    },
+    {
+      "src": "/",
       "dest": "/test.html"
     }
   ]
