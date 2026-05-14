@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="puccio-api-base" content="" />
+    <meta name="puccio-api-port" content="" />
+    <meta name="puccio-backend" content="__BACKEND_ORIGIN__" />
+    <!-- Dove mandare l'utente quando il gioco è finito (fallback se window.close è bloccato). -->
+    <meta name="puccio-exit-url" content="about:blank" />
+    <title>Ruota della Fortuna - Grand Opening</title>
+    <style>
+        /* === RESET & IMPORT FONTS === */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #0d0d0d;
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        /* === TYPOGRAPHY === */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            margin-top: 20px;
+        }
+
+        h1 {
+            color: #b3002d; /* Bordeaux luminoso */
+            font-size: 3rem;
+            text-transform: uppercase;
+            text-shadow: 0 0 15px rgba(179, 0, 45, 0.5);
+            margin-bottom: 10px;
+            font-weight: 900;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            color: #cccccc;
+            font-weight: 400;
+        }
+
+        /* === WHEEL CONTAINER === */
+        .game-area {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .wheel-wrapper {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin-bottom: 30px;
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(128, 0, 32, 0.6);
+            border: 8px solid #33000d;
+            overflow: visible;
+        }
+
+        /* Il Puntatore */
+        .pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 45px solid #d4af37;
+            z-index: 10;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.8));
+        }
+
+        /* Canvas della Ruota */
+        canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            transition: transform 6s cubic-bezier(0.15, 0.85, 0.15, 1);
+        }
+
+        /* Logo al centro della ruota - GIRA CON LA RUOTA */
+        .logo-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120px;
+            height: 120px;
+            margin-top: -60px;
+            margin-left: -60px;
+            z-index: 9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 8px;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.767);
+            border-radius: 50%;
+            transition: transform 6s cubic-bezier(0.15, 0.85, 0.15, 1);
+        }
+
+        .logo-center img {
+            width: 250%;
+            height: 100%;
+            object-fit: contain;
+            filter: brightness(1.3) invert(1) hue-rotate(40deg) saturate(1.5);
+        }
+
+        /* === BUTTON === */
+        button {
+            background: linear-gradient(135deg, #800020, #4a0012);
+            color: white;
+            border: 2px solid #b3002d;
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            transition: all 0.2s ease;
+        }
+
+        button:hover:not(:disabled) {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #b3002d, #800020);
+        }
+
+        button:disabled {
+            background: #333;
+            border-color: #555;
+            color: #888;
+            cursor: not-allowed;
+            transform: scale(1);
+        }
+
+        /* === MODAL (POP-UP) === */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background: #111;
+            border: 3px solid #800020;
+            border-radius: 15px;
+            padding: 40px;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(128, 0, 32, 0.4);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-title {
+            color: #d4af37;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .modal-text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .token-box {
+            background: #222;
+            padding: 10px;
+            border: 1px dashed #d4af37;
+            font-family: monospace;
+            font-size: 1.5rem;
+            color: #d4af37;
+            margin: 20px 0;
+            letter-spacing: 5px;
+        }
+
+        @media (max-width: 500px) {
+            .wheel-wrapper {
+                width: 320px;
+                height: 320px;
+            }
+            .logo-center {
+                width: 90px;
+                height: 90px;
+                margin-top: -45px;
+                margin-left: -45px;
+            }
+            h1 { font-size: 2.2rem; }
+            h2 { font-size: 1rem; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Gira la Ruota!</h1>
+        <h2>Tenta la fortuna: fantastici premi ti aspettano.</h2>
+    </div>
+
+    <div class="game-area">
+        <div class="wheel-wrapper">
+            <div class="pointer"></div>
+            <canvas id="wheelCanvas" width="800" height="800"></canvas>
+            
+            <!-- Logo al centro - GIRA CON LA RUOTA SUL POSTO -->
+            <div class="logo-center" id="logoCenterContainer">
+                <img src="https://raw.githubusercontent.com/pucciottol/puccio-assets/main/Logo%20Pucciotto.svg" alt="Logo Pucciotto">
+            </div>
+        </div>
+        <button id="spinBtn">Gira Ora</button>
+    </div>
+
+    <!-- Pop-up dei risultati -->
+    <div class="modal-overlay" id="resultModal">
+        <div class="modal-content">
+            <h2 class="modal-title" id="modalTitle">Risultato</h2>
+            <div id="modalBody"></div>
+            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px;">
+                <button id="closeModalBtn" style="font-size: 1rem; padding: 10px 25px;">Chiudi</button>
+                <button id="exitBtn" style="font-size: 1rem; padding: 10px 25px; background:#222; border-color:#555; color:#ddd;">Esci</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function puccioApiBaseSync() {
+            if (typeof window.__PUCCIO_RESOLVED_API_BASE__ === "string") return window.__PUCCIO_RESOLVED_API_BASE__;
+            if (typeof window.__PUCCIO_QUIZ_API__ === "string" && window.__PUCCIO_QUIZ_API__.length) {
+                return String(window.__PUCCIO_QUIZ_API__).replace(/\/$/, "");
+            }
+            var custom = document.querySelector('meta[name="puccio-api-base"]');
+            if (custom) {
+                var u = (custom.getAttribute("content") || "").trim();
+                if (u) return u.replace(/\/$/, "");
+            }
+            var back = document.querySelector('meta[name="puccio-backend"]');
+            if (back) {
+                var o = (back.getAttribute("content") || "").trim();
+                if (o && o.indexOf("__") === -1) {
+                    if (o === window.location.origin) return "";
+                    return o.replace(/\/$/, "");
+                }
+            }
+            return null;
+        }
+
+        async function resolvePuccioApiBase() {
+            var sync = puccioApiBaseSync();
+            if (sync !== null) {
+                window.__PUCCIO_RESOLVED_API_BASE__ = sync;
+                return sync;
+            }
+            async function tryHealth(base) {
+                var origin = base === "" ? window.location.origin : base;
+                var url = origin + "/api/health";
+                try {
+                    var r = await fetch(url, { method: "GET", cache: "no-store" });
+                    if (!r.ok) return null;
+                    var j = await r.json().catch(function () { return {}; });
+                    if (j && j.service === "puccioquiz-backend") return base;
+                } catch (e) {}
+                return null;
+            }
+            var h = window.location.hostname;
+            var isLocal = h === "127.0.0.1" || h === "localhost" || h === "[::1]";
+            var portMeta = document.querySelector('meta[name="puccio-api-port"]');
+            var alt = (portMeta && (portMeta.getAttribute("content") || "").trim()) || "3000";
+            var list = [""];
+            if (isLocal) {
+                list.push("http://127.0.0.1:" + alt);
+                if (alt !== "3000") list.push("http://127.0.0.1:3000");
+            }
+            for (var i = 0; i < list.length; i++) {
+                var hit = await tryHealth(list[i]);
+                if (hit !== null) {
+                    window.__PUCCIO_RESOLVED_API_BASE__ = hit;
+                    return hit;
+                }
+            }
+            if (window.location.protocol === "file:") {
+                window.__PUCCIO_RESOLVED_API_BASE__ = "http://127.0.0.1:" + alt;
+                return window.__PUCCIO_RESOLVED_API_BASE__;
+            }
+            // Default to empty string for same-origin requests (e.g., on Render)
+            window.__PUCCIO_RESOLVED_API_BASE__ = "";
+            return "";
+        }
+
+        // === CONFIGURAZIONE SUONI ===
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playWinSound() {
+            const now = audioContext.currentTime;
+            const osc = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            osc.frequency.setValueAtTime(800, now);
+            osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
+            
+            gainNode.gain.setValueAtTime(0.3, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+            
+            osc.start(now);
+            osc.stop(now + 0.2);
+        }
+
+        function playLoseSound() {
+            const now = audioContext.currentTime;
+            const osc = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            osc.frequency.setValueAtTime(600, now);
+            osc.frequency.linearRampToValueAtTime(300, now + 0.3);
+            
+            gainNode.gain.setValueAtTime(0.2, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+            
+            osc.start(now);
+            osc.stop(now + 0.3);
+        }
+
+        function playSpinSound() {
+            const now = audioContext.currentTime;
+            const osc = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.linearRampToValueAtTime(250, now + 0.1);
+            osc.frequency.linearRampToValueAtTime(150, now + 0.2);
+            
+            gainNode.gain.setValueAtTime(0.15, now);
+            gainNode.gain.setValueAtTime(0.15, now + 0.15);
+            gainNode.gain.exponentialRampToValueAtTime(0.05, now + 0.2);
+            
+            osc.start(now);
+            osc.stop(now + 0.2);
+        }
+
+        function playSpinningLoop(duration) {
+            const interval = 150;
+            let elapsed = 0;
+            
+            const spinInterval = setInterval(() => {
+                if (elapsed >= duration) {
+                    clearInterval(spinInterval);
+                    const now = audioContext.currentTime;
+                    const osc = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    osc.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.exponentialRampToValueAtTime(800, now + 0.1);
+                    gainNode.gain.setValueAtTime(0.25, now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                    return;
+                }
+                playSpinSound();
+                elapsed += interval;
+            }, interval);
+        }
+
+        // === CONFIGURAZIONE DATI ===
+        const slicesConfig = [
+            { name: "Crocchettone", color: "#1a1a1a", textColor: "#ffffff" },
+            { name: "Portachiavi", color: "#800020", textColor: "#ffffff" },
+            { name: "Crocchettone", color: "#1a1a1a", textColor: "#ffffff" },
+            { name: "Maglietta", color: "#800020", textColor: "#d4af37" },
+            { name: "Crocchettone", color: "#1a1a1a", textColor: "#ffffff" },
+            { name: "Portachiavi", color: "#800020", textColor: "#ffffff" },
+            { name: "Crocchettone", color: "#1a1a1a", textColor: "#ffffff" },
+            { name: "Portachiavi", color: "#800020", textColor: "#ffffff" },
+            { name: "Crocchettone", color: "#1a1a1a", textColor: "#ffffff" },
+            { name: "Pucciotto", color: "#800020", textColor: "#d4af37" },
+            { name: "Crocchettone", color: "#1a1a1a", textColor: "#ffffff" },
+            { name: "Portachiavi", color: "#800020", textColor: "#ffffff" },
+            { name: "Crocchettone", color: "#1a1a1a", textColor: "#ffffff" },
+            { name: "Portachiavi", color: "#800020", textColor: "#ffffff" },
+            { name: "Crocchettone", color: "#1a1a1a", textColor: "#ffffff" },
+            { name: "Portachiavi", color: "#800020", textColor: "#ffffff" },
+            { name: "Crocchettone", color: "#1a1a1a", textColor: "#ffffff" },
+            { name: "Portachiavi", color: "#800020", textColor: "#ffffff" },
+            { name: "Crocchettone", color: "#1a1a1a", textColor: "#ffffff" },
+            { name: "Pucciotto", color: "#800020", textColor: "#d4af37" }
+        ];
+
+        const totalSlices = slicesConfig.length;
+        const sliceAngle = 360 / totalSlices;
+
+        // === VARIABILI DOM ===
+        const canvas = document.getElementById("wheelCanvas");
+        const ctx = canvas.getContext("2d");
+        const spinBtn = document.getElementById("spinBtn");
+        const resultModal = document.getElementById("resultModal");
+        const modalTitle = document.getElementById("modalTitle");
+        const modalBody = document.getElementById("modalBody");
+        const closeModalBtn = document.getElementById("closeModalBtn");
+        const exitBtn = document.getElementById("exitBtn");
+        const logoCenterContainer = document.getElementById("logoCenterContainer");
+
+        let currentRotation = 0;
+        let isSpinning = false;
+        let wheelLocked = false;
+
+        function escapeHtml(s) {
+            return String(s)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;");
+        }
+
+        function lockWheelUi(buttonLabel) {
+            wheelLocked = true;
+            spinBtn.disabled = true;
+            if (buttonLabel) spinBtn.textContent = buttonLabel;
+        }
+
+        function getExitUrl() {
+            const meta = document.querySelector('meta[name="puccio-exit-url"]');
+            const u = meta ? (meta.getAttribute("content") || "").trim() : "";
+            return u || "about:blank";
+        }
+
+        function clearSession() {
+            try {
+                localStorage.removeItem("puccioQuiz_email");
+                localStorage.removeItem("puccioQuiz_q10");
+                localStorage.removeItem("puccioQuiz_missedList");
+            } catch (_) {}
+        }
+
+        function tryExitPage() {
+            // Obiettivo: chiudere quando possibile, altrimenti uscire in modo "pulito".
+            // window.close funziona solo se la pagina è stata aperta via script (popup/webview/kiosk).
+            clearSession();
+
+            try { window.close(); } catch (_) {}
+
+            // Fallback robusto: pagina locale di "fine" che poi porta a exitUrl
+            // (evita di lasciare la ruota visibile se il close viene bloccato).
+            const exitUrl = encodeURIComponent(getExitUrl());
+            window.location.href = `fine.html?exit=${exitUrl}`;
+        }
+
+        async function bootstrapWheelPage() {
+            const email = (localStorage.getItem("puccioQuiz_email") || "").trim();
+            if (!email) {
+                window.location.replace("test.html");
+                return;
+            }
+            try {
+                const r = await fetch((await resolvePuccioApiBase()) + "/api/participation-state", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email }),
+                });
+                const j = await r.json().catch(() => ({}));
+                if (!r.ok) return;
+                if (!j.exists) {
+                    window.location.replace("test.html");
+                    return;
+                }
+                if (!j.testPassed) {
+                    window.location.replace("perso.html");
+                    return;
+                }
+                if (j.wheelDone) {
+                    lockWheelUi("Già utilizzata");
+                    const h2 = document.querySelector(".header h2");
+                    const until = j.prize_valid_until
+                        ? new Date(j.prize_valid_until).toLocaleString("it-IT")
+                        : "";
+                    if (h2) {
+                        const untilHtml = until
+                            ? `<br><span style="font-size:0.95rem;color:#aaa;">Valido fino al: ${escapeHtml(until)}</span>`
+                            : "";
+                        h2.innerHTML =
+                            "Hai già girato la ruota con questa email.<br>" +
+                            '<span style="color:#d4af37;font-weight:700">' +
+                            escapeHtml(String(j.prize_name || "Premio")) +
+                            "</span><br><span style=\"font-size:0.95rem;color:#aaa;\">Il token è stato inviato via email.</span>" +
+                            untilHtml;
+                    }
+                }
+            } catch (_) {
+                /* offline: il server rifiuta comunque un secondo spin */
+            }
+        }
+        function drawWheel() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = centerX;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < totalSlices; i++) {
+                const startAngle = (i * sliceAngle - 90) * (Math.PI / 180);
+                const endAngle = ((i + 1) * sliceAngle - 90) * (Math.PI / 180);
+
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.closePath();
+                ctx.fillStyle = slicesConfig[i].color;
+                ctx.fill();
+                
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = "#33000d";
+                ctx.stroke();
+
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(startAngle + (sliceAngle / 2) * (Math.PI / 180));
+                ctx.textAlign = "right";
+                ctx.textBaseline = "middle";
+                ctx.fillStyle = slicesConfig[i].textColor;
+                ctx.font = "bold 28px Montserrat, sans-serif";
+                ctx.fillText(slicesConfig[i].name, radius - 40, 0);
+                ctx.restore();
+            }
+        }
+
+        // === LOGICA DEL GIOCO E CALCOLI ===
+        function spinWheel() {
+            if (wheelLocked || isSpinning) return;
+            isSpinning = true;
+            spinBtn.disabled = true;
+
+            playSpinningLoop(6000);
+
+            currentRotation = currentRotation + (360 - (currentRotation % 360));
+
+            const winningIndex = Math.floor(Math.random() * totalSlices);
+            const sliceCenterDegree = winningIndex * sliceAngle + (sliceAngle / 2);
+            
+            const extraSpins = 360 * 8; 
+            const targetRotation = currentRotation + extraSpins + (360 - sliceCenterDegree);
+
+            currentRotation = targetRotation;
+            canvas.style.transform = `rotate(${currentRotation}deg)`;
+            // Logo gira con la ruota mantenendo la posizione centrale
+            logoCenterContainer.style.transform = `rotate(${currentRotation}deg)`;
+
+            canvas.addEventListener('transitionend', async function handleTransitionEnd() {
+                canvas.removeEventListener('transitionend', handleTransitionEnd);
+                try {
+                    await showResult(slicesConfig[winningIndex].name);
+                } finally {
+                    isSpinning = false;
+                    spinBtn.disabled = false;
+                }
+            });
+        }
+
+        function renderPrizeModal(prizeName, prizeValidUntil, errMsg, errIsHtml) {
+            modalTitle.textContent = errMsg ? "Attenzione" : "🎉 Hai Vinto! 🎉";
+            modalTitle.style.color = errMsg ? "#ffb3b3" : "#d4af37";
+            if (errMsg) {
+                modalBody.innerHTML =
+                    '<p class="modal-text">' +
+                    (errIsHtml ? String(errMsg) : escapeHtml(errMsg)) +
+                    "</p>" +
+                    (prizeName
+                        ? '<p style="font-size: 0.9rem; color: #888;">Segmento estratto: <strong>' +
+                          escapeHtml(prizeName) +
+                          "</strong></p>"
+                        : "");
+            } else {
+                const until = prizeValidUntil ? new Date(prizeValidUntil).toLocaleString("it-IT") : "";
+                modalBody.innerHTML = `
+                    <p class="modal-text">Complimenti! Ti sei aggiudicato: <br><strong>${escapeHtml(prizeName)}</strong>!</p>
+                    <p class="modal-text" style="margin-bottom:12px;">Ti abbiamo inviato il <strong>token via email</strong>. Controlla anche la cartella spam.</p>
+                    ${until ? `<p style="font-size: 0.9rem; color: #aaa;">Valido fino al: ${escapeHtml(until)}</p>` : ""}
+                    <p style="font-size: 0.9rem; color: #888;">Per riscattare il premio mostra il token ricevuto via email alla cassa.</p>
+                `;
+            }
+            resultModal.classList.add("active");
+        }
+
+        async function showResult(prizeName) {
+            playWinSound();
+            setTimeout(() => playWinSound(), 200);
+            setTimeout(() => playWinSound(), 400);
+
+            const email = (localStorage.getItem("puccioQuiz_email") || "").trim();
+            if (!email) {
+                renderPrizeModal(prizeName, "", "Email non trovata. Torna al quiz e invia di nuovo il modulo.", false);
+                return;
+            }
+            try {
+                const r = await fetch((await resolvePuccioApiBase()) + "/api/spin-result", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email: email, prizeName: prizeName })
+                });
+                const j = await r.json().catch(function () { return {}; });
+                if (r.status === 409) {
+                    renderPrizeModal(prizeName, j.prize_valid_until || "", j.error || "Hai già girato la ruota con questa email.", false);
+                    lockWheelUi("Già utilizzata");
+                    return;
+                }
+                if (!r.ok || !j.ok) {
+                    // Premio assegnato ma email non inviata: proponiamo reinvio
+                    const errText = (j && j.error ? String(j.error) : ("Errore server (" + r.status + ")"));
+                    const extraHtml =
+                        escapeHtml(errText) +
+                        "<br><br><button id=\"resendBtn\" style=\"margin-top:10px;font-size:1rem;padding:10px 25px;\">Reinvia email</button>";
+                    renderPrizeModal(prizeName, j.prize_valid_until || "", extraHtml, true);
+                    setTimeout(() => {
+                        const btn = document.getElementById("resendBtn");
+                        if (!btn) return;
+                        btn.addEventListener("click", async () => {
+                            btn.disabled = true;
+                            btn.textContent = "Invio...";
+                            try {
+                                const rr = await fetch((await resolvePuccioApiBase()) + "/api/resend-token", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ email })
+                                });
+                                const jj = await rr.json().catch(() => ({}));
+                                if (!rr.ok || !jj.ok) throw new Error(jj.error || ("HTTP " + rr.status));
+                                btn.textContent = "Inviata!";
+                            } catch (e) {
+                                btn.textContent = "Errore: riprova";
+                                btn.disabled = false;
+                            }
+                        });
+                    }, 0);
+                    return;
+                }
+                renderPrizeModal(prizeName, j.prize_valid_until, "", false);
+                lockWheelUi("Già utilizzata");
+            } catch (e) {
+                renderPrizeModal(prizeName, "", "Connessione al server non riuscita.", false);
+            }
+        }
+
+        // === EVENT LISTENERS ===
+        spinBtn.addEventListener("click", spinWheel);
+        closeModalBtn.addEventListener("click", () => {
+            resultModal.classList.remove("active");
+        });
+        exitBtn.addEventListener("click", () => {
+            tryExitPage();
+        });
+
+        (async function initPage() {
+            await resolvePuccioApiBase().catch(function () {});
+            await bootstrapWheelPage();
+            drawWheel();
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,872 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="puccio-api-base" content="" />
+  <meta name="puccio-api-port" content="" />
+  <meta name="puccio-backend" content="__BACKEND_ORIGIN__" />
+  <title>PuccioQuiz — Quiz Salento</title>
+  <style>
+    :root{
+      --bg:#070707;
+      --card:#0f0f10;
+      --accent-red:#ff3b3b;
+      --accent-deep:#b22222;
+      --sage:#9caf88;
+      --muted:#bfc8bf;
+      --glass:rgba(255,255,255,0.03);
+      --radius:14px;
+      --shadow:0 18px 60px rgba(0,0,0,0.7);
+      --focus:0 0 0 4px rgba(156,175,136,0.12);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    /* Page layout and scroll fix */
+    html,body{
+      min-height:100vh;
+      margin:0;
+      background:
+        radial-gradient(800px 400px at 10% 10%, rgba(156,175,136,0.05), transparent 8%),
+        radial-gradient(700px 350px at 90% 90%, rgba(255,59,59,0.04), transparent 8%),
+        linear-gradient(180deg,var(--bg),#040404);
+      color:#eef2ea;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding:36px 20px;
+      overflow:auto;
+    }
+
+    /* Central wrapper */
+    .wrap{
+      width:100%;
+      max-width:820px;
+      margin:0 auto;
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius: calc(var(--radius) + 6px);
+      box-shadow: var(--shadow);
+      padding:28px;
+      box-sizing:border-box;
+      border:1px solid rgba(255,255,255,0.03);
+    }
+
+    /* Title & subtitle with nicer palette */
+    .title-row{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      align-items:flex-start;
+      margin-bottom:18px;
+    }
+
+    h1.title{
+      margin:0;
+      font-size:30px;
+      line-height:1;
+      letter-spacing:-0.6px;
+      font-weight:900;
+      background: linear-gradient(90deg, #ffd9d9, var(--accent-red), var(--sage));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 6px 18px rgba(0,0,0,0.6);
+    }
+
+    p.subtitle{
+      margin:0;
+      color:var(--muted);
+      font-size:15px;
+      max-width:100%;
+    }
+
+    /* Promo block */
+    .promo{
+      margin:14px 0 22px 0;
+      padding:14px;
+      border-radius:12px;
+      background: linear-gradient(90deg, rgba(255,59,59,0.04), rgba(156,175,136,0.03));
+      border:1px solid rgba(255,255,255,0.02);
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+    }
+    .promo .p-title{ font-weight:800; color:#fff; font-size:16px; }
+    .promo .p-desc{ color:var(--muted); font-size:14px; }
+
+    /* Form layout */
+    form{ display:block; width:100%; box-sizing:border-box; }
+    .field{ margin-bottom:16px; }
+
+    label.input-label{
+      display:block;
+      font-weight:700;
+      color:#fff;
+      margin-bottom:8px;
+      font-size:14px;
+    }
+
+    input[type="email"]{
+      width:100%;
+      box-sizing:border-box;
+      padding:12px 14px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,0.06);
+      background:rgba(255,255,255,0.01);
+      color:#eef2ea;
+      font-size:15px;
+      box-shadow: inset 0 -6px 18px rgba(0,0,0,0.45);
+    }
+    input[type="email"]::placeholder{ color:rgba(255,255,255,0.35); }
+
+    /* Question block */
+    .question{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      padding:12px;
+      border-radius:12px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+      border:1px solid rgba(255,255,255,0.02);
+      margin-bottom:12px;
+    }
+
+    .q-index{
+      min-width:44px;
+      height:44px;
+      border-radius:10px;
+      background: linear-gradient(180deg,var(--accent-red),var(--accent-deep));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:900;
+      color:#fff;
+      font-size:16px;
+      flex:0 0 auto;
+      box-shadow: 0 8px 22px rgba(178,34,34,0.12);
+    }
+
+    .q-body{ flex:1; }
+    .q-title{ margin:0 0 10px 0; font-weight:800; font-size:15px; color:#fff; }
+
+    .options{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    /* Option pill (shared style) */
+    .option{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:8px 12px;
+      border-radius:999px;
+      cursor:pointer;
+      user-select:none;
+      transition:transform .12s ease, box-shadow .12s ease;
+      border:1px solid rgba(255,255,255,0.03);
+      background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+      color:#f6fbf2;
+      font-size:14px;
+    }
+    .option:hover{ transform:translateY(-3px); box-shadow:0 12px 30px rgba(0,0,0,0.45); }
+
+    /*Radio input visuals (round) */
+    .option input[type="radio"]{
+      -webkit-appearance:none; appearance:none;
+      width:18px; height:18px; border-radius:50%;
+      border:2px solid rgba(255,255,255,0.12); background:transparent;
+      display:inline-block; margin:0; flex:0 0 auto;
+    }
+    .option input[type="radio"]:checked{
+      border-color:transparent;
+      background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.18), transparent 30%),
+                  linear-gradient(90deg, var(--accent-red), var(--sage));
+      box-shadow: 0 6px 18px rgba(178,34,34,0.18), inset 0 -4px 10px rgba(0,0,0,0.25);
+    }
+
+    /* Checkbox visuals for last question: round to match radios */
+    .option input[type="checkbox"]{
+      -webkit-appearance:none; appearance:none;
+      width:18px; height:18px; border-radius:50%;
+      border:2px solid rgba(255,255,255,0.12); background:transparent;
+      display:inline-block; margin:0; flex:0 0 auto;
+    }
+    .option input[type="checkbox"]:checked{
+      border-color:transparent;
+      background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.18), transparent 30%),
+                  linear-gradient(90deg, var(--accent-red), var(--sage));
+      box-shadow: 0 6px 18px rgba(178,34,34,0.18), inset 0 -4px 10px rgba(0,0,0,0.25);
+    }
+
+    .option input:focus{ outline:none; box-shadow: var(--focus); }
+
+    /* Submit */
+    .submit-wrap{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      margin-top:6px;
+    }
+    button.submit{
+      background: linear-gradient(90deg, var(--accent-red), var(--accent-deep));
+      color:#fff;
+      border:none;
+      padding:12px 18px;
+      border-radius:12px;
+      font-weight:800;
+      cursor:pointer;
+      box-shadow: 0 12px 36px rgba(255,59,59,0.18);
+      transition:transform .12s ease, box-shadow .12s ease;
+    }
+    button.submit:hover{ transform:translateY(-3px); box-shadow:0 22px 48px rgba(178,34,34,0.22); }
+    .note{ color:var(--muted); font-size:13px; }
+
+    /* Bottom instruction about the wheel */
+    .wheel-note{
+      margin-top:14px;
+      padding:12px;
+      border-radius:10px;
+      background: linear-gradient(90deg, rgba(156,175,136,0.03), rgba(255,59,59,0.03));
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    /* Results */
+    .results{
+      margin-top:16px;
+      padding:14px;
+      border-radius:12px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.03);
+      color:#eaf2ea;
+    }
+    .result-item{ margin-bottom:10px; display:flex; gap:10px; align-items:flex-start; }
+    .result-item .dot{ width:8px; height:8px; border-radius:50%; margin-top:6px; flex:0 0 auto; }
+
+    /* Responsive */
+    @media (max-width:720px){
+      .card{ padding:18px; }
+      h1.title{ font-size:24px; }
+      p.subtitle{ max-width:100%; }
+      .promo{ flex-direction:column; gap:8px; }
+      .q-index{ min-width:36px; height:36px; font-size:14px; }
+    }
+
+    /* Modal "carino" per messaggi (es. già partecipato) */
+    .modal-overlay{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,0.78);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .18s ease;
+      z-index:9999;
+    }
+    .modal-overlay.active{ opacity:1; pointer-events:auto; }
+    .modal-content{
+      width:min(520px, 100%);
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+      border:1px solid rgba(255,255,255,0.06);
+      border-radius:16px;
+      box-shadow: 0 22px 70px rgba(0,0,0,0.75);
+      padding:22px;
+      text-align:center;
+    }
+    .modal-title{
+      margin:0 0 10px 0;
+      font-size:20px;
+      font-weight:900;
+      background: linear-gradient(90deg, #ffd9d9, var(--accent-red), var(--sage));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+    .modal-text{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.5;
+    }
+    .modal-actions{
+      margin-top:16px;
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      flex-wrap:wrap;
+    }
+    .modal-btn{
+      border:none;
+      border-radius:12px;
+      padding:12px 14px;
+      font-weight:900;
+      cursor:pointer;
+      box-shadow: 0 12px 36px rgba(255,59,59,0.12);
+      color:#081226;
+      background: linear-gradient(90deg,var(--sage),var(--accent-red));
+    }
+    .modal-btn.secondary{
+      background: transparent;
+      color:#eaf2ea;
+      border:1px solid rgba(255,255,255,0.10);
+      box-shadow:none;
+      font-weight:800;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" role="main" aria-labelledby="main-title">
+      <div class="title-row">
+        <h1 id="main-title" class="title">PuccioQuiz</h1>
+        <p class="subtitle">Con questo piccolo quiz avrai la possibilità di vincere dei fantastici gadget E NON SOLO di questa nuova apertura! Basterà inserire la tua mail e rispondere a tutte le domande correttamente! Il risultato potrà essere visualizzato alla fine del quiz.</p>
+      </div>
+
+      <div class="promo" aria-hidden="false">
+        <div>
+          <div class="p-title">Partecipa e vinci</div>
+          <div class="p-desc">Inserisci la tua email qui sotto per partecipare: se rispondi correttamente a tutte le domande entri in gara per i gadget e altre sorprese legate alla nuova apertura.</div>
+        </div>
+      </div>
+
+      <form id="salentoForm" action="#" method="post" novalidate>
+        <div class="field">
+          <label class="input-label" for="email">Email per partecipare</label>
+          <input id="email" name="email" type="email" placeholder="tuo@esempio.com" required />
+        </div>
+
+        <div class="field">
+          <label class="option" style="font-size:13px;color:var(--muted);line-height:1.4;">
+            <input type="checkbox" name="gdpr" required style="margin-right:8px;" />
+            Acconsento al trattamento dei miei dati personali per la partecipazione al concorso e per ricevere comunicazioni relative all'apertura del locale. <a href="GDPR.html" target="_blank" style="color:var(--sage);">Privacy Policy</a>
+          </label>
+        </div>
+
+        <!-- Q1 -->
+        <div class="question" role="group" aria-labelledby="q1">
+          <div class="q-index">1</div>
+          <div class="q-body">
+            <div class="q-title" id="q1">Qual è il tipico pane salentino?</div>
+            <div class="options" role="radiogroup" aria-labelledby="q1">
+              <label class="option"><input type="radio" name="q1" value="puccia" required />Puccia</label>
+              <label class="option"><input type="radio" name="q1" value="focaccia" />Focaccia</label>
+              <label class="option"><input type="radio" name="q1" value="ciabatta" />Ciabatta</label>
+              <label class="option"><input type="radio" name="q1" value="pane_toscano" />Pane toscano</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="question" role="group" aria-labelledby="q2">
+          <div class="q-index">2</div>
+          <div class="q-body">
+            <div class="q-title" id="q2">Qual è la bevanda tipica estiva del Salento?</div>
+            <div class="options" role="radiogroup" aria-labelledby="q2">
+              <label class="option"><input type="radio" name="q2" value="caffe_ghiaccio_mandorla" required />Caffè in ghiaccio con latte di mandorla</label>
+              <label class="option"><input type="radio" name="q2" value="granita" />Granita</label>
+              <label class="option"><input type="radio" name="q2" value="orzo" />Orzo freddo</label>
+              <label class="option"><input type="radio" name="q2" value="limonata" />Limonata</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="question" role="group" aria-labelledby="q3">
+          <div class="q-index">3</div>
+          <div class="q-body">
+            <div class="q-title" id="q3">Quale piatto povero salentino si "sponza"</div>
+            <div class="options" role="radiogroup" aria-labelledby="q3">
+              <label class="option"><input type="radio" name="q3" value="friselle" required />Friselle</label>
+              <label class="option"><input type="radio" name="q3" value="panzanella" />Panzanella</label>
+              <label class="option"><input type="radio" name="q3" value="bruschette" />Bruschette</label>
+              <label class="option"><input type="radio" name="q3" value="crostini" />Crostini</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="question" role="group" aria-labelledby="q4">
+          <div class="q-index">4</div>
+          <div class="q-body">
+            <div class="q-title" id="q4">Qual è il dolce tradizionale più famoso del Salento?</div>
+            <div class="options" role="radiogroup" aria-labelledby="q4">
+              <label class="option"><input type="radio" name="q4" value="pasticciotto" required />Pasticciotto</label>
+              <label class="option"><input type="radio" name="q4" value="cartellate" />Cartellate</label>
+              <label class="option"><input type="radio" name="q4" value="zeppole" />Zeppole</label>
+              <label class="option"><input type="radio" name="q4" value="tiramisu" />Tiramisù</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q5 -->
+        <div class="question" role="group" aria-labelledby="q5">
+          <div class="q-index">5</div>
+          <div class="q-body">
+            <div class="q-title" id="q5">Qual è la danza tradizionale del Salento?</div>
+            <div class="options" role="radiogroup" aria-labelledby="q5">
+              <label class="option"><input type="radio" name="q5" value="pizzica" required />Pizzica</label>
+              <label class="option"><input type="radio" name="q5" value="tarantella" />Tarantella</label>
+              <label class="option"><input type="radio" name="q5" value="samba" />Samba</label>
+              <label class="option"><input type="radio" name="q5" value="valzer" />Valzer</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q6 -->
+        <div class="question" role="group" aria-labelledby="q6">
+          <div class="q-index">6</div>
+          <div class="q-body">
+            <div class="q-title" id="q6">Quale vino è tipico del Salento?</div>
+            <div class="options" role="radiogroup" aria-labelledby="q6">
+              <label class="option"><input type="radio" name="q6" value="negroamaro" required />Negroamaro</label>
+              <label class="option"><input type="radio" name="q6" value="chianti" />Chianti</label>
+              <label class="option"><input type="radio" name="q6" value="barolo" />Barolo</label>
+              <label class="option"><input type="radio" name="q6" value="prosecco" />Prosecco</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q7 -->
+        <div class="question" role="group" aria-labelledby="q7">
+          <div class="q-index">7</div>
+          <div class="q-body">
+            <div class="q-title" id="q7">Qual è un piatto tipico salentino a base di carne?</div>
+            <div class="options" role="radiogroup" aria-labelledby="q7">
+              <label class="option"><input type="radio" name="q7" value="pezzetti" required />Pezzetti di cavallo al sugo</label>
+              <label class="option"><input type="radio" name="q7" value="genovese" />Genovese</label>
+              <label class="option"><input type="radio" name="q7" value="agnello" />Agnello arrosto</label>
+              <label class="option"><input type="radio" name="q7" value="coda" />Coda alla vaccinara</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q8 -->
+        <div class="question" role="group" aria-labelledby="q8">
+          <div class="q-index">8</div>
+          <div class="q-body">
+            <div class="q-title" id="q8">Qual è un formaggio tipico del Salento dal sapore molto intenso?</div>
+            <div class="options" role="radiogroup" aria-labelledby="q8">
+              <label class="option"><input type="radio" name="q8" value="ricotta_fote" required />Ricotta fote (scante)</label>
+              <label class="option"><input type="radio" name="q8" value="pecorino" />Pecorino stagionato</label>
+              <label class="option"><input type="radio" name="q8" value="caciocavallo" />Caciocavallo</label>
+              <label class="option"><input type="radio" name="q8" value="mozzarella" />Mozzarella</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q9 -->
+        <div class="question" role="group" aria-labelledby="q9">
+          <div class="q-index">9</div>
+          <div class="q-body">
+            <div class="q-title" id="q9">Quale prodotto agricolo è simbolo del Salento?</div>
+            <div class="options" role="radiogroup" aria-labelledby="q9">
+              <label class="option"><input type="radio" name="q9" value="olio_evo" required />Olio EVO</label>
+              <label class="option"><input type="radio" name="q9" value="grano" />Grano</label>
+              <label class="option"><input type="radio" name="q9" value="pomodori" />Pomodori</label>
+              <label class="option"><input type="radio" name="q9" value="mandorle" />Mandorle</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q10 -->
+        <div class="question" role="group" aria-labelledby="q10">
+          <div class="q-index">10</div>
+          <div class="q-body">
+            <div class="q-title" id="q10">Secondo te cosa aprirà qui?</div>
+            <div class="options" aria-labelledby="q10">
+              <label class="option"><input type="checkbox" name="q10" value="laboratorio_segreto" />Laboratorio segreto</label>
+              <label class="option"><input type="checkbox" name="q10" value="ritrovo_motociclisti" />Ritrovo di motociclisti</label>
+              <label class="option"><input type="checkbox" name="q10" value="museo_delle_cere" />Museo delle cere</label>
+              <label class="option"><input type="checkbox" name="q10" value="meccanico_astonavi" />Meccanico per astonavi aliene</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="submit-wrap">
+          <button type="submit" class="submit" aria-label="Invia risposte">Invia risposte</button>
+          <div class="note">Le prime 9 domande sono obbligatorie. Inserisci una email valida per partecipare al concorso.</div>
+        </div>
+
+        <div class="wheel-note">Chi risponderà correttamente a tutte le domande potrà accedere alla ruota della fortuna.</div>
+
+        <div id="results" class="results" hidden aria-live="polite"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal messaggi -->
+  <div class="modal-overlay" id="infoModal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="infoModalTitle">
+      <h3 class="modal-title" id="infoModalTitle">Info</h3>
+      <p class="modal-text" id="infoModalText"></p>
+      <div class="modal-actions">
+        <button class="modal-btn secondary" id="infoModalSecondaryBtn" type="button">Torna al quiz</button>
+        <button class="modal-btn" id="infoModalPrimaryBtn" type="button">Continua</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const form = document.getElementById('salentoForm');
+      const resultsEl = document.getElementById('results');
+      const emailInput = document.getElementById('email');
+
+      function puccioApiBaseSync() {
+        if (typeof window.__PUCCIO_RESOLVED_API_BASE__ === 'string') return window.__PUCCIO_RESOLVED_API_BASE__;
+        if (typeof window.__PUCCIO_QUIZ_API__ === 'string' && window.__PUCCIO_QUIZ_API__.length) {
+          return String(window.__PUCCIO_QUIZ_API__).replace(/\/$/, '');
+        }
+        var custom = document.querySelector('meta[name="puccio-api-base"]');
+        if (custom) {
+          var u = (custom.getAttribute('content') || '').trim();
+          if (u) return u.replace(/\/$/, '');
+        }
+        var back = document.querySelector('meta[name="puccio-backend"]');
+        if (back) {
+          var o = (back.getAttribute('content') || '').trim();
+          if (o && o.indexOf('__') === -1) {
+            if (o === window.location.origin) return '';
+            return o.replace(/\/$/, '');
+          }
+        }
+        return null;
+      }
+
+      async function resolvePuccioApiBase() {
+        var sync = puccioApiBaseSync();
+        if (sync !== null) {
+          window.__PUCCIO_RESOLVED_API_BASE__ = sync;
+          return sync;
+        }
+        async function tryHealth(base) {
+          var origin = base === '' ? window.location.origin : base;
+          var url = origin + '/api/health';
+          try {
+            var r = await fetch(url, { method: 'GET', cache: 'no-store' });
+            if (!r.ok) return null;
+            var j = await r.json().catch(function () { return {}; });
+            if (j && j.service === 'puccioquiz-backend') return base;
+          } catch (e) {}
+          return null;
+        }
+        var h = window.location.hostname;
+        var isLocal = h === '127.0.0.1' || h === 'localhost' || h === '[::1]';
+        var portMeta = document.querySelector('meta[name="puccio-api-port"]');
+        var alt = (portMeta && (portMeta.getAttribute('content') || '').trim()) || '3000';
+        var list = [''];
+        if (isLocal) {
+          list.push('http://127.0.0.1:' + alt);
+          if (alt !== '3000') list.push('http://127.0.0.1:3000');
+        }
+        for (var i = 0; i < list.length; i++) {
+          var hit = await tryHealth(list[i]);
+          if (hit !== null) {
+            window.__PUCCIO_RESOLVED_API_BASE__ = hit;
+            return hit;
+          }
+        }
+        if (window.location.protocol === 'file:') {
+          window.__PUCCIO_RESOLVED_API_BASE__ = 'http://127.0.0.1:' + alt;
+          return window.__PUCCIO_RESOLVED_API_BASE__;
+        }
+        // Default to empty string for same-origin requests (e.g., on Render)
+        window.__PUCCIO_RESOLVED_API_BASE__ = '';
+        return '';
+      }
+
+      const correct = {
+        q1: 'puccia', q2: 'caffe_ghiaccio_mandorla', q3: 'friselle',
+        q4: 'pasticciotto', q5: 'pizzica', q6: 'negroamaro',
+        q7: 'pezzetti', q8: 'ricotta_fote', q9: 'olio_evo'
+      };
+
+      function getSelectedRadio(name){ const el = form.querySelector(`input[name="${name}"]:checked`); return el ? el.value : null; }
+      function getCheckedCheckboxes(name){ return Array.from(form.querySelectorAll(`input[name="${name}"]:checked`)).map(i=>i.value); }
+
+      function validate(){
+        if(!emailInput.value || !emailInput.checkValidity()){
+          return {ok:false, reason:'email'};
+        }
+        const gdprCheckbox = form.querySelector('input[name="gdpr"]:checked');
+        if(!gdprCheckbox){
+          return {ok:false, reason:'gdpr'};
+        }
+        for(let i=1;i<=9;i++){
+          if(!getSelectedRadio('q'+i)) return {ok:false, reason:'q'+i};
+        }
+        return {ok:true};
+      }
+
+      function friendlyTextForKey(key){
+        const map = {
+          puccia:'Puccia', focaccia:'Focaccia', ciabatta:'Ciabatta', pane_toscano:'Pane toscano',
+          caffe_ghiaccio_mandorla:'Caffè in ghiaccio con latte di mandorla', granita:'Granita', orzo:'Orzo freddo', limonata:'Limonata',
+          friselle:'Friselle', panzanella:'Panzanella', bruschette:'Bruschette', crostini:'Crostini',
+          pasticciotto:'Pasticciotto', cartellate:'Cartellate', zeppole:'Zeppole', tiramisu:'Tiramisù',
+          pizzica:'Pizzica', tarantella:'Tarantella', samba:'Samba', valzer:'Valzer',
+          primitivo:'Primitivo', chianti:'Chianti', barolo:'Barolo', negroamaro:'Negroamaro', prosecco:'Prosecco',
+          pezzetti:'Pezzetti di cavallo al sugo', genovese:'Genovese', agnello:'Agnello arrosto', coda:'Coda alla vaccinara',
+          ricotta_fote:'Ricotta fote (scante)', pecorino:'Pecorino', caciocavallo:'Caciocavallo', mozzarella:'Mozzarella',
+          olio_evo:'Olio EVO', grano:'Grano', pomodori:'Pomodori', mandorle:'Mandorle',
+          laboratorio_segreto:'Laboratorio segreto', ritrovo_motociclisti:'Ritrovo di motociclisti',
+          museo_delle_cere:'Museo delle cere', meccanico_astonavi:'Meccanico per astonavi aliene'
+        };
+        return map[key] || key;
+      }
+
+      // Funzione per randomizzare le opzioni delle domande
+      function shuffleOptions(){
+        for(let i=1;i<=10;i++){
+          const optionsContainer = form.querySelector(`[aria-labelledby="q${i}"].options`);
+          if(!optionsContainer) continue;
+
+          const options = Array.from(optionsContainer.children);
+          // Fisher-Yates shuffle
+          for(let j=options.length-1;j>0;j--){
+            const k = Math.floor(Math.random() * (j+1));
+            [options[j], options[k]] = [options[k], options[j]];
+          }
+
+          // Reappend in shuffled order
+          options.forEach(opt => optionsContainer.appendChild(opt));
+        }
+      }
+
+      // Esegui shuffle all'avvio
+      shuffleOptions();
+
+      resolvePuccioApiBase().catch(function () {});
+
+      async function getParticipationState(email){
+        const base = await resolvePuccioApiBase();
+        const r = await fetch(base + '/api/participation-state', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok) return null;
+        return j;
+      }
+
+      function showInfoModal(opts){
+        const overlay = document.getElementById('infoModal');
+        const titleEl = document.getElementById('infoModalTitle');
+        const textEl = document.getElementById('infoModalText');
+        const primaryBtn = document.getElementById('infoModalPrimaryBtn');
+        const secondaryBtn = document.getElementById('infoModalSecondaryBtn');
+
+        if(!overlay || !titleEl || !textEl || !primaryBtn || !secondaryBtn){
+          alert((opts && opts.message) ? opts.message : 'Hai già partecipato.');
+          return;
+        }
+
+        titleEl.textContent = (opts && opts.title) ? opts.title : 'Info';
+        textEl.textContent = (opts && opts.message) ? opts.message : '';
+        primaryBtn.textContent = (opts && opts.primaryLabel) ? opts.primaryLabel : 'Continua';
+        secondaryBtn.textContent = (opts && opts.secondaryLabel) ? opts.secondaryLabel : 'Torna al quiz';
+
+        function close(){
+          overlay.classList.remove('active');
+          overlay.setAttribute('aria-hidden', 'true');
+          // rimuove handler per evitare accumuli
+          primaryBtn.onclick = null;
+          secondaryBtn.onclick = null;
+          overlay.onclick = null;
+        }
+
+        primaryBtn.onclick = function(){
+          close();
+          if (opts && typeof opts.onPrimary === 'function') opts.onPrimary();
+        };
+        secondaryBtn.onclick = function(){
+          close();
+          if (opts && typeof opts.onSecondary === 'function') opts.onSecondary();
+        };
+        overlay.onclick = function(ev){
+          if(ev.target === overlay) secondaryBtn.click();
+        };
+
+        overlay.classList.add('active');
+        overlay.setAttribute('aria-hidden', 'false');
+      }
+
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+        resultsEl.hidden = true; resultsEl.innerHTML = '';
+
+        const v = validate();
+        if(!v.ok){
+          if(v.reason === 'email'){
+            alert('Inserisci una email valida per partecipare.');
+            emailInput.focus();
+            return;
+          } else if(v.reason === 'gdpr'){
+            alert('Devi accettare il trattamento dei dati personali per partecipare al concorso.');
+            form.querySelector('input[name="gdpr"]').focus();
+            return;
+          } else {
+            const qnum = v.reason.replace('q','');
+            alert('Per favore rispondi alla domanda ' + qnum + '.');
+            const el = form.querySelector(`[name="${v.reason}"]`);
+            if(el) el.focus();
+            return;
+          }
+        }
+
+        let score = 0;
+        for(let i=1;i<=9;i++){
+          const key = 'q'+i;
+          const sel = getSelectedRadio(key);
+          if(sel === correct[key]) score++;
+        }
+
+        const answers = {};
+        for (let i = 1; i <= 9; i++) {
+          const key = 'q' + i;
+          answers[key] = getSelectedRadio(key);
+        }
+
+        const q10Selected = getCheckedCheckboxes('q10');
+        const email = emailInput.value.trim();
+        const eligible = (score === 9);
+
+        async function postQuizFinish(testPassed){
+          var base = await resolvePuccioApiBase();
+          var r;
+          try {
+            r = await fetch(base + '/api/quiz-finish', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: email,
+                // sicurezza: il server ricalcola testPassed dalle risposte
+                answers: answers,
+                // legacy (server può ignorare)
+                testPassed: testPassed,
+                q10Values: q10Selected
+              })
+            });
+          } catch (netErr) {
+            throw new Error(
+              'Server non raggiungibile (connessione rifiutata). Avvia il backend nella cartella del progetto: esegui npm install poi npm start, poi ricarica questa pagina da http://127.0.0.1:3000/test.html.'
+            );
+          }
+
+          const j = await r.json().catch(function(){ return {}; });
+
+          // FIX: 409 non è “connessione non riuscita”, significa “già partecipato”
+          if(r.status === 409){
+            return { already: true, message: (j && j.error) ? String(j.error) : 'Hai già completato il quiz con questa email.' };
+          }
+
+          if(!r.ok) {
+            var detail = j.error || ('HTTP ' + r.status);
+            if (r.status === 405) {
+              detail += ' — La POST non è gestita da questo host. Avvia anche npm start e apri il quiz dalla porta del backend.';
+            }
+            throw new Error(detail);
+          }
+
+          // Nuovo backend: ritorna già qui l'informazione "alreadyParticipated"
+          if (j && j.alreadyParticipated) {
+            return { already: true, message: (j && j.message) ? String(j.message) : 'Hai già completato il quiz con questa email.' };
+          }
+
+          return { ok: true, testPassed: (j && typeof j.testPassed === 'boolean') ? j.testPassed : testPassed };
+        }
+
+        async function handleAlreadyPlayed(){
+          // Se l'utente ha già partecipato, lo portiamo allo stato giusto (ruota/perso).
+          // Così non vede più il messaggio “Connessione al server non riuscita”.
+          try {
+            const state = await getParticipationState(email);
+            if (state && state.exists) {
+              localStorage.setItem('puccioQuiz_email', email);
+              localStorage.setItem('puccioQuiz_q10', JSON.stringify(q10Selected));
+              const goTo = state.testPassed ? 'ruota.html' : 'perso.html';
+              const msg = state.testPassed
+                ? (state.wheelDone
+                    ? "Hai già partecipato e hai già girato la ruota. Controlla la tua email per il token."
+                    : "Hai già partecipato e hai superato il quiz: puoi andare direttamente alla ruota.")
+                : "Hai già partecipato con questa email. Per regolamento non puoi ripetere il quiz online.";
+
+              showInfoModal({
+                title: 'Hai già partecipato',
+                message: msg,
+                primaryLabel: state.testPassed ? 'Vai alla ruota' : 'OK',
+                secondaryLabel: 'Torna al quiz',
+                onPrimary: function(){ window.location.href = goTo; },
+                onSecondary: function(){ window.scrollTo({ top: 0, behavior: 'smooth' }); }
+              });
+              return true;
+            }
+          } catch(_) {}
+          showInfoModal({
+            title: 'Hai già partecipato',
+            message: 'Hai già completato il quiz con questa email.',
+            primaryLabel: 'OK',
+            secondaryLabel: 'Torna al quiz',
+            onPrimary: function(){},
+            onSecondary: function(){ window.scrollTo({ top: 0, behavior: 'smooth' }); }
+          });
+          return true;
+        }
+
+        if(eligible){
+          localStorage.setItem('puccioQuiz_email', email);
+          localStorage.setItem('puccioQuiz_q10', JSON.stringify(q10Selected));
+          postQuizFinish(true).then(async function(resp){
+            if(resp && resp.already){
+              await handleAlreadyPlayed();
+              return;
+            }
+            const passed = resp && typeof resp.testPassed === 'boolean' ? resp.testPassed : true;
+            window.location.href = passed ? 'ruota.html' : 'perso.html';
+          }).catch(function(err){
+            alert('Connessione al server non riuscita: ' + (err && err.message ? err.message : err));
+          });
+        } else {
+          const missedList = [];
+          for(let i=1;i<=9;i++){
+            const key = 'q'+i;
+            const sel = getSelectedRadio(key);
+            if(sel !== correct[key]){
+              missedList.push({
+                q: i,
+                title: document.getElementById(key).textContent,
+                your: friendlyTextForKey(sel),
+                correct: friendlyTextForKey(correct[key])
+              });
+            }
+          }
+          localStorage.setItem('puccioQuiz_email', email);
+          localStorage.setItem('puccioQuiz_missedList', JSON.stringify(missedList));
+          localStorage.setItem('puccioQuiz_q10', JSON.stringify(q10Selected));
+          postQuizFinish(false).then(async function(resp){
+            if(resp && resp.already){
+              await handleAlreadyPlayed();
+              return;
+            }
+            const passed = resp && typeof resp.testPassed === 'boolean' ? resp.testPassed : false;
+            window.location.href = passed ? 'ruota.html' : 'perso.html';
+          }).catch(function(err){
+            alert('Connessione al server non riuscita: ' + (err && err.message ? err.message : err));
+          });
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
