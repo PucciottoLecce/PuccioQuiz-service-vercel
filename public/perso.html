@@ -3,181 +3,292 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <!-- Dove mandare l'utente quando “Vieni all'apertura” esce (fallback se window.close è bloccato). -->
   <meta name="puccio-exit-url" content="about:blank" />
   <title>PuccioQuiz — Esito</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet" />
   <style>
     :root{
-      --bg:#070707;
-      --card:#0f0f10;
-      --accent1:#ff3b3b;
-      --accent2:#9caf88;
-      --muted:#bfc8bf;
-      --glass: rgba(255,255,255,0.03);
+      --bg:#080706;
+      --surface:#110f0d;
+      --surface2:#181410;
+      --bordeaux:#8b1a2e;
+      --bordeaux-bright:#c0243d;
+      --gold:#c9a84c;
+      --gold-light:#e8c96a;
+      --cream:#f0e8d8;
+      --muted:#a09080;
+      --sage:#8fa87e;
       --radius:14px;
-      --shadow: 0 20px 60px rgba(0,0,0,0.7);
-      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --shadow:0 24px 80px rgba(0,0,0,0.75);
     }
+    *{box-sizing:border-box;}
 
     html,body{
-      height:100%;
+      min-height:100vh;
       margin:0;
-      background:
-        radial-gradient(800px 400px at 10% 10%, rgba(156,175,136,0.04), transparent 8%),
-        radial-gradient(700px 350px at 90% 90%, rgba(255,59,59,0.03), transparent 8%),
-        linear-gradient(180deg,var(--bg),#040404);
-      color:#eef2ea;
+      background:var(--bg);
+      color:var(--cream);
+      font-family:'DM Sans',system-ui,sans-serif;
       -webkit-font-smoothing:antialiased;
       display:flex;
       align-items:center;
       justify-content:center;
-      padding:24px;
+      padding:28px 18px;
     }
 
-    .lose-wrap{
+    body::before{
+      content:'';
+      position:fixed;
+      inset:0;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity:0.025;
+      pointer-events:none;
+      z-index:0;
+    }
+    body::after{
+      content:'';
+      position:fixed;
+      inset:0;
+      background:
+        radial-gradient(ellipse 50% 40% at 10% 90%, rgba(139,26,46,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 30% at 90% 10%, rgba(201,168,76,0.04) 0%, transparent 60%);
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .wrap{
+      position:relative;
+      z-index:1;
       width:100%;
-      max-width:920px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius: calc(var(--radius) + 6px);
-      box-shadow: var(--shadow);
-      padding:28px;
-      box-sizing:border-box;
-      border:1px solid rgba(255,255,255,0.03);
+      max-width:900px;
       display:grid;
-      grid-template-columns: 1fr 360px;
-      gap:20px;
+      grid-template-columns:1fr 340px;
+      gap:16px;
       align-items:start;
     }
 
-    .lose-card{
-      background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
-      border-radius:12px;
-      padding:20px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
-      border:1px solid rgba(255,255,255,0.02);
+    .card{
+      background:linear-gradient(160deg, rgba(255,255,255,0.022) 0%, rgba(255,255,255,0.007) 100%);
+      border:1px solid rgba(255,255,255,0.055);
+      border-radius:calc(var(--radius) + 4px);
+      box-shadow:var(--shadow);
+      padding:28px;
+      position:relative;
+      overflow:hidden;
+    }
+    .card::before{
+      content:'';
+      position:absolute;
+      top:0;left:0;right:0;
+      height:1px;
+      background:linear-gradient(90deg,transparent,rgba(139,26,46,0.3),transparent);
+    }
+
+    /* Page header */
+    .page-header{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:22px;
+    }
+    .page-logo{
+      width:42px; height:42px;
+      border-radius:50%;
+      background:var(--surface2);
+      border:1px solid rgba(201,168,76,0.15);
+      display:flex; align-items:center; justify-content:center;
+    }
+    .page-logo img{ width:68%; height:68%; object-fit:contain; }
+    .page-eyebrow{
+      font-size:10px; font-weight:700;
+      letter-spacing:0.15em; text-transform:uppercase;
+      color:var(--gold);
+    }
+
+    /* Icon */
+    .result-icon{
+      width:72px; height:72px;
+      border-radius:18px;
+      background:linear-gradient(160deg, var(--surface2), rgba(139,26,46,0.12));
+      border:1px solid rgba(255,255,255,0.05);
+      display:flex; align-items:center; justify-content:center;
+      margin-bottom:16px;
+      box-shadow:0 8px 24px rgba(0,0,0,0.4);
     }
 
     .badge{
-      display:inline-block;
-      padding:8px 12px;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:5px 12px;
       border-radius:999px;
-      background: linear-gradient(90deg,var(--accent1),var(--accent2));
-      color:#081226;
-      font-weight:800;
-      font-size:13px;
+      background:rgba(139,26,46,0.12);
+      border:1px solid rgba(139,26,46,0.2);
+      color:rgba(192,36,61,0.9);
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:0.1em;
+      text-transform:uppercase;
       margin-bottom:12px;
     }
 
     h2{
-      margin:6px 0 8px 0;
-      font-size:22px;
-      color:#fff;
-      letter-spacing:-0.3px;
+      font-family:'Playfair Display',serif;
+      font-size:clamp(1.4rem,3.5vw,1.9rem);
+      font-weight:900;
+      line-height:1.15;
+      color:var(--cream);
+      margin:0 0 12px;
     }
 
     p.lead{
-      margin:0 0 14px 0;
       color:var(--muted);
-      font-size:15px;
-      line-height:1.45;
+      font-size:14.5px;
+      line-height:1.65;
+      margin:0 0 14px;
     }
 
-    .icon{
-      width:84px;
-      height:84px;
-      border-radius:20px;
+    /* Disclaimer */
+    .disclaimer{
+      padding:11px 14px;
+      border-radius:10px;
+      background:rgba(143,168,126,0.05);
+      border:1px solid rgba(143,168,126,0.12);
       display:flex;
-      align-items:center;
-      justify-content:center;
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border:1px solid rgba(255,255,255,0.03);
-      margin-bottom:12px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+      gap:10px;
+      align-items:flex-start;
+      margin-top:8px;
     }
-    .icon svg{ filter: drop-shadow(0 6px 18px rgba(0,0,0,0.5)); }
+    .disclaimer p{ font-size:12px; color:rgba(143,168,126,0.8); line-height:1.5; margin:0; }
+    .disclaimer strong{ color:rgba(143,168,126,1); }
 
+    /* Side panel */
     .side{
-      padding:18px;
-      border-radius:12px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));
-      border:1px solid rgba(255,255,255,0.02);
-      color:var(--muted);
-      font-size:14px;
+      background:linear-gradient(160deg, rgba(255,255,255,0.018) 0%, rgba(255,255,255,0.006) 100%);
+      border:1px solid rgba(255,255,255,0.05);
+      border-radius:calc(var(--radius) + 4px);
+      padding:22px;
+      box-shadow:var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .side::before{
+      content:'';
+      position:absolute;
+      top:0;left:0;right:0;
+      height:1px;
+      background:linear-gradient(90deg,transparent,rgba(201,168,76,0.15),transparent);
     }
 
-    .side h4{ margin:0 0 8px 0; color:#fff; font-size:16px; }
-    .side p{ margin:0 0 12px 0; color:var(--muted); font-size:14px; }
+    .side h4{
+      font-family:'Playfair Display',serif;
+      font-size:1.1rem;
+      font-weight:700;
+      color:var(--cream);
+      margin:0 0 10px;
+    }
+    .side p{
+      color:var(--muted);
+      font-size:13.5px;
+      line-height:1.6;
+      margin:0 0 18px;
+    }
 
-    .actions{ display:flex; flex-direction:column; gap:10px; margin-top:8px; }
+    .actions{ display:flex; flex-direction:column; gap:10px; }
+
     .btn{
       display:inline-flex;
       align-items:center;
       justify-content:center;
       gap:8px;
-      padding:12px 14px;
+      padding:12px 16px;
       border-radius:12px;
       border:none;
       cursor:pointer;
-      font-weight:800;
-      color:#081226;
-      background: linear-gradient(90deg,var(--accent2),var(--accent1));
-      box-shadow: 0 12px 36px rgba(255,59,59,0.12);
+      font-family:'DM Sans',sans-serif;
+      font-weight:700;
+      font-size:14px;
       text-decoration:none;
+      transition:transform 0.14s ease, box-shadow 0.14s ease;
+    }
+    .btn:hover{ transform:translateY(-1px); }
+    .btn.primary{
+      background:linear-gradient(135deg, var(--bordeaux), #5c0f1c);
+      color:var(--cream);
+      box-shadow:0 8px 24px rgba(139,26,46,0.25);
     }
     .btn.secondary{
-      background: transparent;
-      color: #eaf2ea;
-      border:1px solid rgba(255,255,255,0.06);
-      font-weight:700;
-      box-shadow:none;
+      background:transparent;
+      color:var(--cream);
+      border:1px solid rgba(255,255,255,0.08);
     }
     .btn.ghost{
-      background: transparent;
-      color: var(--muted);
-      border:1px dashed rgba(255,255,255,0.04);
-      font-weight:700;
+      background:transparent;
+      color:var(--muted);
+      border:1px dashed rgba(255,255,255,0.06);
     }
 
-    .small-note{ margin-top:12px; color:var(--muted); font-size:13px; }
+    .small-note{
+      margin-top:16px;
+      font-size:12px;
+      color:rgba(160,144,128,0.6);
+    }
 
-    @media (max-width:880px){
-      .lose-wrap{ grid-template-columns: 1fr; padding:18px; }
+    @media(max-width:800px){
+      .wrap{ grid-template-columns:1fr; max-width:520px; }
       .side{ order:2; }
+      html,body{ align-items:flex-start; }
     }
   </style>
 </head>
 <body>
-  <div class="lose-wrap" role="dialog" aria-labelledby="lose-title" aria-describedby="lose-desc">
-    <div class="lose-card">
-      <div class="icon" aria-hidden="true">
-        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-          <rect x="0.5" y="0.5" width="23" height="23" rx="6.5" stroke="rgba(255,255,255,0.04)"/>
-          <path d="M8 9.5C8.55228 9.5 9 9.05228 9 8.5C9 7.94772 8.55228 7.5 8 7.5C7.44772 7.5 7 7.94772 7 8.5C7 9.05228 7.44772 9.5 8 9.5Z" fill="#ffb3b3"/>
-          <path d="M16 9.5C16.5523 9.5 17 9.05228 17 8.5C17 7.94772 16.5523 7.5 16 7.5C15.4477 7.5 15 7.94772 15 8.5C15 9.05228 15.4477 9.5 16 9.5Z" fill="#ffb3b3"/>
-          <path d="M8.5 15.5C9.66667 14 14.3333 14 15.5 15.5" stroke="#ffb3b3" stroke-width="1.4" stroke-linecap="round"/>
+  <div class="wrap" role="dialog" aria-labelledby="lose-title" aria-describedby="lose-desc">
+    <div class="card">
+      <div class="page-header">
+        <div class="page-logo">
+          <img src="logol.svg" alt="Pucciotto" />
+        </div>
+        <div class="page-eyebrow">PuccioQuiz</div>
+      </div>
+
+      <div class="result-icon" aria-hidden="true">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14 17C15.1 17 16 16.1 16 15C16 13.9 15.1 13 14 13C12.9 13 12 13.9 12 15C12 16.1 12.9 17 14 17Z" fill="rgba(192,36,61,0.7)"/>
+          <path d="M26 17C27.1 17 28 16.1 28 15C28 13.9 27.1 13 26 13C24.9 13 24 13.9 24 15C24 16.1 24.9 17 26 17Z" fill="rgba(192,36,61,0.7)"/>
+          <path d="M14 27C16.3333 24 23.6667 24 26 27" stroke="rgba(192,36,61,0.7)" stroke-width="2" stroke-linecap="round"/>
         </svg>
       </div>
 
-      <div class="badge">PuccioQuiz</div>
-      <h2 id="lose-title">Peccato — non questa volta</h2>
-      <p id="lose-desc" class="lead">
-        Non hai risposto correttamente a tutte le domande richieste per accedere alla ruota della fortuna.
-        Non è prevista una seconda possibilità online, ma ti invitiamo a venire all'apertura del locale per partecipare di persona e scoprire tutte le sorprese.
-      </p>
+      <div class="badge">
+        <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3.5" fill="currentColor"/></svg>
+        PuccioQuiz
+      </div>
 
-      <!-- Privacy: niente riepilogo delle risposte su questa pagina -->
-      <p class="lead" style="font-size:14px;margin-top:10px;">
-        Per motivi di correttezza, su questa pagina non è possibile rivedere le risposte del quiz.
-      </p>
+      <h2 id="lose-title">Peccato — non questa volta</h2>
+      <p id="lose-desc" class="lead">Non hai risposto correttamente a tutte le domande richieste. Non è prevista una seconda possibilità online, ma ti invitiamo a venire all'apertura del locale per partecipare di persona.</p>
+      <p class="lead" style="font-size:13.5px;">Per motivi di correttezza, su questa pagina non è possibile rivedere le risposte del quiz.</p>
+
+      <div class="disclaimer" role="note">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><circle cx="8" cy="8" r="7" stroke="rgba(143,168,126,0.6)" stroke-width="1.3"/><path d="M8 5v4M8 11v.5" stroke="rgba(143,168,126,0.8)" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <p><strong>Iniziativa promozionale, non un concorso a premi.</strong> I gadget e prodotti di valore equivalente vengono distribuiti fisicamente all'apertura del locale.</p>
+      </div>
     </div>
 
     <aside class="side" aria-labelledby="side-title">
-      <h4 id="side-title">Cosa succede ora</h4>
-      <p>Hai perso l'accesso alla ruota online per questa sessione. Ti aspettiamo all'apertura del locale: porta la tua voglia di divertirti e scoprirai gadget, assaggi e altre sorprese.</p>
+      <h4 id="side-title">Cosa fare ora</h4>
+      <p>Hai esaurito la partecipazione online. Vieni all'apertura del locale: porta la tua energia e scoprirai gadget, assaggi e tante altre sorprese.</p>
 
       <div class="actions">
-        <button class="btn ghost" id="shareBtn" type="button">Condividi con un amico</button>
-        <a class="btn" id="visitBtn" href="#" role="button">Vieni all'apertura</a>
+        <button class="btn ghost" id="shareBtn" type="button">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="13" cy="3" r="2" stroke="currentColor" stroke-width="1.4"/><circle cx="13" cy="13" r="2" stroke="currentColor" stroke-width="1.4"/><circle cx="3" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/><path d="M4.8 7.1L11.2 4M4.8 8.9L11.2 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Condividi con un amico
+        </button>
+        <a class="btn primary" id="visitBtn" href="#" role="button">
+          Vieni all'apertura
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
       </div>
 
       <div class="small-note" id="emailNote">Email registrata: <strong id="userEmail">—</strong></div>
@@ -212,7 +323,6 @@
       }
 
       function resolveQuizUrl(){
-        // URL assoluto della pagina del quiz (utile per share)
         try {
           return new URL('test.html', window.location.href).href;
         } catch(_) {
@@ -221,7 +331,6 @@
       }
 
       async function copyToClipboardFallback(text){
-        // clipboard API può essere bloccata: fallback a prompt
         try {
           if (navigator.clipboard && navigator.clipboard.writeText) {
             await navigator.clipboard.writeText(text);
@@ -240,8 +349,6 @@
       function loadFromLocalStorage(){
         const email = (localStorage.getItem('puccioQuiz_email') || '').trim();
         userEmailEl.textContent = email ? email : '—';
-
-        // Importante: puliamo subito per non lasciare dati di sessione.
         clearSession();
       }
 
@@ -249,23 +356,16 @@
         const quizUrl = resolveQuizUrl();
         const text = "Sto partecipando a PuccioQuiz! Prova anche tu: " + quizUrl;
 
-        // 1) Web Share API (mobile)
         if (navigator.share) {
           try {
             await navigator.share({ title: 'PuccioQuiz', text, url: quizUrl });
             return;
-          } catch (_) {
-            // se l'utente annulla o fallisce, proviamo i fallback
-          }
+          } catch (_) {}
         }
-
-        // 2) WhatsApp share (desktop/mobile)
         try {
           openWhatsappShare(text);
           return;
         } catch (_) {}
-
-        // 3) Clipboard / prompt
         await copyToClipboardFallback(text);
       });
 
