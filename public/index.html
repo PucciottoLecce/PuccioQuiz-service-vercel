@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self';style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;font-src https://fonts.gstatic.com;img-src 'self' data:;script-src 'self' 'unsafe-inline';connect-src *;">
+<title>PuccioQuiz — Benvenuto</title>
+<meta name="theme-color" content="#c0392b">
+<link rel="icon" type="image/svg+xml" href="logol.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Lobster&family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--cream:#faf8f5;--white:#fff;--black:#1a1a1a;--red:#c0392b;--red2:#a93226;--border:#e8e4e0;--muted:#999}
+html,body{min-height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--black);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body{display:flex;flex-direction:column;align-items:center;padding:28px max(16px,env(safe-area-inset-left)) calc(28px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-right))}
+.logo-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:20px;animation:fadeDown .45s ease both}
+.logo-wrap img{width:130px;height:auto}
+.quiz-badge{margin-top:8px;display:inline-flex;align-items:center;gap:6px;background:var(--red);color:#fff;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:6px 14px;border-radius:50px;min-height:32px}
+.card{width:100%;max-width:420px;background:var(--white);border:1.5px solid var(--border);border-radius:20px;box-shadow:0 4px 24px rgba(0,0,0,.07);padding:22px 20px 20px;animation:fadeUp .45s .08s ease both}
+.steps{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+.step{display:flex;gap:12px;align-items:flex-start;padding:13px 14px;border-radius:14px;background:var(--cream);border:1.5px solid var(--border)}
+.step-num{min-width:34px;height:34px;border-radius:10px;background:var(--red);display:flex;align-items:center;justify-content:center;font-family:'Lobster',cursive;font-size:17px;color:#fff;flex-shrink:0;box-shadow:0 3px 10px rgba(192,57,43,.25)}
+.step-title{font-size:14px;font-weight:700;margin-bottom:3px}
+.step-desc{font-size:13px;color:var(--muted);line-height:1.45}
+.divider{height:1px;background:var(--border);margin:16px 0}
+.prize-strip{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:16px}
+.prize-chip{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:999px;background:#fff3f2;border:1px solid rgba(192,57,43,.18);color:var(--red);font-size:12px;font-weight:600;min-height:32px}
+.prize-chip::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--red);flex-shrink:0}
+.disclaimer{padding:11px 13px;border-radius:12px;background:#f3faf0;border:1.5px solid rgba(80,160,60,.2);display:flex;gap:9px;align-items:flex-start;margin-bottom:18px}
+.disclaimer p{font-size:12px;color:#4a7a40;line-height:1.5}
+.disclaimer strong{color:#3a6830}
+.cta-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:16px 20px;min-height:56px;border-radius:16px;border:none;background:var(--red);color:#fff;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:700;text-decoration:none;cursor:pointer;box-shadow:0 4px 16px rgba(192,57,43,.28);transition:background .18s,transform .18s;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none}
+.cta-btn:hover{background:var(--red2);transform:translateY(-1px)}
+.cta-btn:active{transform:translateY(0);background:var(--red2)}
+.cta-left{display:flex;align-items:center;gap:10px}
+.cta-arrow{font-size:16px;opacity:.7;transition:transform .18s}
+.cta-btn:hover .cta-arrow{transform:translateX(4px);opacity:1}
+.footer-note{margin-top:14px;text-align:center;font-size:12px;color:var(--muted);line-height:1.5}
+.footer-note a{color:var(--red);text-decoration:none;border-bottom:1px solid rgba(192,57,43,.3);display:inline-block;padding:2px 0;transition:border-color .15s}
+.footer-note a:hover{border-color:var(--red)}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media(max-width:480px){body{padding-top:20px}.logo-wrap img{width:110px}.card{padding:18px 14px;border-radius:16px}.step-title{font-size:13px}.step-desc,.disclaimer p{font-size:12px}.cta-btn{font-size:15px}}
+@media(max-width:340px){.prize-chip{font-size:11px;padding:5px 10px}}
+</style>
+</head>
+<body>
+
+<div class="logo-wrap">
+  <img src="logol.svg" alt="Logo Pucciotto" onerror="this.src='logol.png'"/>
+  <span class="quiz-badge">🎯 PuccioQuiz</span>
+</div>
+
+<div class="card">
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Inserisci la tua email</div>
+        <div class="step-desc">Serve per ricevere il token premio in caso di vittoria.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">Rispondi a 9 domande</div>
+        <div class="step-desc">Devi rispondere correttamente a tutte per accedere alla ruota.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">Gira la ruota dei premi</div>
+        <div class="step-desc">Scopri il gadget e ricevi il token via email per ritirarlo all'apertura.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="prize-strip">
+    <span class="prize-chip">Gadget esclusivi</span>
+    <span class="prize-chip">Prodotti promozionali</span>
+    <span class="prize-chip">Sorprese all'apertura</span>
+  </div>
+
+  <div class="disclaimer" role="note">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:2px" aria-hidden="true">
+      <circle cx="8" cy="8" r="7" stroke="#4a7a40" stroke-width="1.3" opacity=".7"/>
+      <path d="M8 5v4M8 11v.5" stroke="#4a7a40" stroke-width="1.3" stroke-linecap="round"/>
+    </svg>
+    <p><strong>Iniziativa promozionale, non un concorso a premi.</strong> I gadget vengono distribuiti fisicamente all'apertura del locale Pucciotto — Via dei Biccari 15, Lecce.</p>
+  </div>
+
+  <a class="cta-btn" href="test.html" role="button">
+    <span class="cta-left"><span aria-hidden="true">🎯</span>Inizia il Quiz</span>
+    <span class="cta-arrow" aria-hidden="true">→</span>
+  </a>
+
+  <div class="footer-note">
+    Partecipando accetti il trattamento dei tuoi dati —
+    <a href="GDPR.html">Informativa Privacy</a>
+  </div>
+</div>
+
+</body>
+</html>

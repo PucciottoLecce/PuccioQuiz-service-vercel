@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy, Cookie & Termini — PuccioQuiz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lobster&family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { font-family: 'DM Sans', sans-serif; background: #faf7f4; color: #1a1a1a; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+    body { padding: 32px 20px 80px; }
+    .wrap { max-width: 700px; margin: 0 auto; }
+
+    /* ── HEADER ── */
+    .header { display: flex; align-items: center; gap: 14px; margin-bottom: 32px; }
+    .header-text .eyebrow { font-family: 'Lobster', cursive; font-size: 11px; color: #c0392b; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 2px; }
+    .header-text .title { font-family: 'Lobster', cursive; font-size: 22px; color: #1a1a1a; line-height: 1.1; }
+
+    /* ── TAB NAV ── */
+    .tabs { display: flex; gap: 6px; margin-bottom: 24px; background: #fff; border: 1px solid #e8e4e0; border-radius: 12px; padding: 5px; }
+    .tab-btn { flex: 1; padding: 10px 6px; border: none; border-radius: 8px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; background: transparent; color: #888; transition: all .2s; }
+    .tab-btn.active { background: #c0392b; color: #fff; }
+
+    /* ── CARD ── */
+    .card { background: #ffffff; border: 1px solid #e8e4e0; border-radius: 16px; padding: 28px; margin-bottom: 14px; }
+    .card-title { font-family: 'Lobster', cursive; font-size: 22px; color: #c0392b; margin-bottom: 4px; }
+    .card-sub { font-size: 13px; color: #999; margin-bottom: 20px; }
+    .intro { background: #fff8f0; border: 1px solid #ffe4cc; border-radius: 10px; padding: 14px 16px; margin-bottom: 24px; font-size: 13px; color: #996633; line-height: 1.55; }
+    .intro strong { color: #1a1a1a; }
+
+    /* ── SECTIONS ── */
+    .section { display: flex; gap: 14px; align-items: flex-start; padding: 16px; border-radius: 10px; background: #faf7f4; border: 1px solid #e8e4e0; margin-bottom: 10px; }
+    .sec-num { min-width: 36px; height: 36px; border-radius: 9px; background: #c0392b; display: flex; align-items: center; justify-content: center; font-family: 'Lobster', cursive; font-size: 16px; color: #ffffff; flex-shrink: 0; }
+    .sec-body { flex: 1; }
+    .sec-title { font-weight: 700; font-size: 14px; color: #1a1a1a; margin-bottom: 8px; }
+    .sec-text { font-size: 13.5px; color: #666; line-height: 1.65; }
+    .sec-text strong { color: #1a1a1a; }
+
+    /* ── LISTS ── */
+    .dot-list { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+    .dot-item { display: flex; gap: 10px; align-items: flex-start; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: #c0392b; margin-top: 5px; flex-shrink: 0; }
+    .dot-text { font-size: 13.5px; color: #666; line-height: 1.55; }
+
+    /* ── TAGS ── */
+    .tag-list { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .tag { padding: 5px 12px; border-radius: 999px; background: #fff0ee; border: 1px solid #f5c6c0; color: #c0392b; font-size: 12px; font-weight: 600; }
+
+    /* ── NOTE BOX ── */
+    .note-box { background: #faf7f4; border: 1px solid #e8e4e0; border-radius: 10px; padding: 14px 16px; margin-top: 16px; font-size: 13px; color: #888; line-height: 1.6; }
+    .note-box strong { color: #555; }
+
+    /* ── TABLE (cookie) ── */
+    .table-wrap { border-radius: 8px; margin-top: 12px; }
+    .cookie-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .cookie-table th { background: #f4f0ec; color: #555; padding: 8px 10px; text-align: left; font-weight: 700; border-bottom: 2px solid #e8e4e0; }
+    .cookie-table td { padding: 8px 10px; border-bottom: 1px solid #f0ece8; color: #666; vertical-align: top; word-break: break-word; }
+    .cookie-table tr:last-child td { border-bottom: none; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 700; }
+    .badge-tech { background: #e3f2fd; color: #1565c0; }
+    @media (max-width: 540px) {
+      .cookie-table thead { display: none; }
+      .cookie-table, .cookie-table tbody, .cookie-table tr, .cookie-table td { display: block; width: 100%; }
+      .cookie-table tr { background: #fff; border: 1px solid #e8e4e0; border-radius: 10px; margin-bottom: 10px; padding: 12px 14px; }
+      .cookie-table tr:last-child td { border-bottom: 1px solid #f0ece8; }
+      .cookie-table tr td:last-child { border-bottom: none !important; }
+      .cookie-table td { padding: 6px 0; border-bottom: 1px dashed #f0ece8; font-size: 12.5px; }
+      .cookie-table td::before { content: attr(data-label); display: block; font-weight: 700; font-size: 10px; color: #999; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 2px; }
+    }
+
+    /* ── BOTTOM ── */
+    .btn-wrap { text-align: center; margin-top: 28px; }
+    .back-btn { display: inline-block; padding: 14px 32px; background: #c0392b; color: #fff; border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; transition: transform .15s; }
+    .back-btn:hover { transform: translateY(-1px); }
+    .back-btn:active { transform: scale(.97); }
+    .update-note { text-align: center; font-size: 11px; color: #bbb; margin-top: 14px; }
+
+    /* ── COOKIE BANNER ── */
+    #cookie-banner {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: #1a1a1a; color: #f0ece8;
+      padding: 16px 20px calc(16px + env(safe-area-inset-bottom, 0px));
+      z-index: 9999;
+      display: flex; flex-wrap: wrap; gap: 14px; align-items: center;
+      box-shadow: 0 -4px 20px rgba(0,0,0,.3);
+      border-top: 3px solid #c0392b;
+    }
+    #cookie-banner.hidden { display: none; }
+    .banner-text { flex: 1; min-width: 200px; font-size: 13px; line-height: 1.5; }
+    .banner-text a { color: #e8a090; text-decoration: underline; }
+    .banner-actions { display: flex; gap: 10px; flex-shrink: 0; }
+    .btn-cookie-accept { background: #c0392b; color: #fff; border: none; border-radius: 8px; padding: 10px 18px; font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; touch-action: manipulation; min-height: 44px; }
+    .btn-cookie-reject { background: transparent; color: #aaa; border: 1px solid #444; border-radius: 8px; padding: 10px 18px; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; touch-action: manipulation; min-height: 44px; }
+    .btn-cookie-accept:hover { background: #a93226; }
+    .btn-cookie-reject:hover { color: #fff; border-color: #888; }
+    @media (max-width: 480px) {
+      html, body { padding: 20px 14px 80px; }
+      .card { padding: 20px 16px; }
+      .tabs { flex-direction: column; }
+      #cookie-banner { flex-direction: column; align-items: stretch; gap: 10px; }
+      .banner-actions { justify-content: stretch; }
+      .btn-cookie-accept, .btn-cookie-reject { flex: 1; text-align: center; }
+    }
+
+    /* ── HIDDEN PANELS ── */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+  </style>
+</head>
+<body>
+
+<!-- Cookie Banner -->
+<div id="cookie-banner" class="hidden" role="dialog" aria-label="Consenso cookie" aria-live="polite">
+  <div class="banner-text">
+    🍪 Usiamo <strong>solo cookie tecnici essenziali</strong> per il funzionamento del sito.
+    Nessun cookie di profilazione o marketing.
+    <a href="#cookie" id="banner-details-link">Dettagli →</a>
+  </div>
+  <div class="banner-actions">
+    <button class="btn-cookie-reject" id="btn-cookie-reject">Solo essenziali</button>
+    <button class="btn-cookie-accept" id="btn-cookie-accept">Accetta e continua</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="header">
+    <img src="logol.svg" alt="Logo Pucciotto" width="52" height="52" style="border-radius:10px;flex-shrink:0;" onerror="this.src='logol.png'" />
+    <div class="header-text">
+      <div class="eyebrow">Pucciotto srls</div>
+      <div class="title">Privacy, Cookie & Termini</div>
+    </div>
+  </div>
+
+  <!-- TAB NAVIGATION -->
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" role="tab" aria-selected="true"  data-tab="privacy">🔒 Privacy</button>
+    <button class="tab-btn"        role="tab" aria-selected="false" data-tab="cookie" id="cookie">🍪 Cookie</button>
+    <button class="tab-btn"        role="tab" aria-selected="false" data-tab="termini">📋 Termini</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       TAB 1 — PRIVACY POLICY
+  ════════════════════════════════════════ -->
+  <div class="tab-panel active" id="panel-privacy">
+    <div class="card">
+      <div class="card-title">Informativa Privacy</div>
+      <div class="card-sub">Ai sensi del Regolamento UE 2016/679 (GDPR)</div>
+      <div class="intro"><strong>Trasparenza prima di tutto.</strong> Questa pagina spiega come raccogliamo e utilizziamo i tuoi dati personali nell'ambito della partecipazione al quiz promozionale PuccioQuiz.</div>
+
+      <div class="section">
+        <div class="sec-num">1</div>
+        <div class="sec-body">
+          <div class="sec-title">Titolare del Trattamento</div>
+          <p class="sec-text">
+            <strong>Pucciotto srls</strong><br>
+            Sede legale: <strong>Via dei Biccari 15, Lecce (LE) 73100</strong><br>
+            Email: <strong>pucciottolecce@gmail.com</strong><br>
+            Rappresentante legale e Responsabile privacy: <strong>il legale rappresentante pro-tempore</strong>
+          </p>
+          <p class="sec-text" style="margin-top:10px;">Non è nominato un DPO (Data Protection Officer) in quanto il trattamento dei dati non rientra nei casi di nomina obbligatoria ai sensi dell'art. 37 GDPR.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-num">2</div>
+        <div class="sec-body">
+          <div class="sec-title">Dati Raccolti e Finalità</div>
+          <p class="sec-text">Raccogliamo i dati da te forniti al momento della partecipazione al quiz. Le finalità sono:</p>
+          <div class="dot-list">
+            <div class="dot-item"><div class="dot"></div><span class="dot-text"><strong>Gestione della partecipazione</strong> — indirizzo email e risposte al quiz. Base giuridica: consenso espresso (art. 6 §1 lett. a GDPR) fornito compilando il modulo.</span></div>
+            <div class="dot-item"><div class="dot"></div><span class="dot-text"><strong>Invio del token ruota</strong> — se superi il quiz con tutte le risposte corrette, il tuo indirizzo email viene usato per inviarti il codice di accesso alla ruota dei gadget. Base giuridica: esecuzione dell'iniziativa (art. 6 §1 lett. b GDPR).</span></div>
+            <div class="dot-item"><div class="dot"></div><span class="dot-text"><strong>Comunicazioni sull'apertura</strong> (solo se consenso espresso) — aggiornamenti e novità relativi all'apertura del locale Pucciotto. Puoi revocare il consenso in qualsiasi momento scrivendo a <strong>pucciottolecce@gmail.com</strong>.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-num">3</div>
+        <div class="sec-body">
+          <div class="sec-title">Conservazione dei Dati</div>
+          <p class="sec-text">I dati relativi alla partecipazione al quiz (email e risposte) sono conservati per <strong>12 mesi</strong> dalla data di partecipazione, dopodiché vengono eliminati. I dati per finalità di comunicazione vengono conservati fino alla revoca del consenso.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-num">4</div>
+        <div class="sec-body">
+          <div class="sec-title">I tuoi Diritti (artt. 15–22 GDPR)</div>
+          <p class="sec-text">In ogni momento puoi esercitare i seguenti diritti scrivendo a <strong>pucciottolecce@gmail.com</strong>:</p>
+          <div class="tag-list">
+            <span class="tag">Accesso</span>
+            <span class="tag">Rettifica</span>
+            <span class="tag">Cancellazione</span>
+            <span class="tag">Limitazione</span>
+            <span class="tag">Portabilità</span>
+            <span class="tag">Opposizione</span>
+          </div>
+          <p class="sec-text" style="margin-top:12px;">Puoi inoltre proporre reclamo al <strong>Garante per la Protezione dei Dati Personali</strong> (<a href="https://www.garanteprivacy.it" target="_blank" rel="noopener noreferrer" style="color:#c0392b;">garanteprivacy.it</a>).</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-num">5</div>
+        <div class="sec-body">
+          <div class="sec-title">Servizi di Terze Parti</div>
+          <p class="sec-text">I dati possono essere elaborati da fornitori tecnici in qualità di <strong>Responsabili del Trattamento</strong> (art. 28 GDPR):</p>
+          <div class="dot-list">
+            <div class="dot-item"><div class="dot"></div><span class="dot-text"><strong>Supabase / PostgreSQL</strong> — archiviazione email e risposte quiz (server in EU). <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer" style="color:#c0392b;">Privacy Policy</a></span></div>
+            <div class="dot-item"><div class="dot"></div><span class="dot-text"><strong>Brevo (ex Sendinblue)</strong> — invio email transazionali (token ruota). I dati trasmessi sono limitati all'indirizzo email e al codice token. Server in EU. <a href="https://www.brevo.com/it/legal/privacypolicy/" target="_blank" rel="noopener noreferrer" style="color:#c0392b;">Privacy Brevo</a></span></div>
+            <div class="dot-item"><div class="dot"></div><span class="dot-text"><strong>Vercel</strong> — hosting del backend del quiz (server in EU/US). <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" style="color:#c0392b;">Privacy Vercel</a></span></div>
+          </div>
+          <p class="sec-text" style="margin-top:10px;">I dati <strong>non vengono mai venduti</strong> a terzi né usati per finalità diverse da quelle indicate.</p>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /panel-privacy -->
+
+  <!-- ═══════════════════════════════════════
+       TAB 2 — COOKIE POLICY
+  ════════════════════════════════════════ -->
+  <div class="tab-panel" id="panel-cookie">
+    <div class="card">
+      <div class="card-title">Cookie Policy</div>
+      <div class="card-sub">Ai sensi del Provvedimento Garante 8/5/2014 e del GDPR</div>
+      <div class="intro"><strong>Usiamo solo cookie tecnici essenziali.</strong> Non utilizziamo cookie di profilazione, tracciamento o marketing di terze parti. Non è richiesto consenso per i cookie tecnici ai sensi del Considerando 25 della Direttiva ePrivacy, ma lo chiediamo per trasparenza.</div>
+
+      <div class="section">
+        <div class="sec-num">1</div>
+        <div class="sec-body">
+          <div class="sec-title">Cosa sono i Cookie</div>
+          <p class="sec-text">I cookie sono piccoli file di testo salvati nel tuo browser quando visiti un sito. Permettono al sito di ricordare le tue azioni e preferenze per un periodo di tempo.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-num">2</div>
+        <div class="sec-body">
+          <div class="sec-title">Cookie e storage utilizzati da questo sito</div>
+          <div class="table-wrap"><table class="cookie-table">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Tipo</th>
+                <th>Durata</th>
+                <th>Finalità</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td data-label="Nome"><code>puccioQuiz_email</code></td>
+                <td data-label="Tipo"><span class="badge badge-tech">Tecnico</span></td>
+                <td data-label="Durata">Sessione browser</td>
+                <td data-label="Finalità">Salva l'email inserita per il passaggio tra le pagine del quiz (localStorage).</td>
+              </tr>
+              <tr>
+                <td data-label="Nome"><code>puccioQuiz_q10</code></td>
+                <td data-label="Tipo"><span class="badge badge-tech">Tecnico</span></td>
+                <td data-label="Durata">Sessione browser</td>
+                <td data-label="Finalità">Salva le risposte alla domanda bonus per il passaggio alla pagina successiva (localStorage).</td>
+              </tr>
+              <tr>
+                <td data-label="Nome"><code>puccioQuiz_missedList</code></td>
+                <td data-label="Tipo"><span class="badge badge-tech">Tecnico</span></td>
+                <td data-label="Durata">Sessione browser</td>
+                <td data-label="Finalità">Salva le domande sbagliate per mostrarle nella pagina di riepilogo (localStorage).</td>
+              </tr>
+              <tr>
+                <td data-label="Nome"><code>pucciotto_cookie_consent</code></td>
+                <td data-label="Tipo"><span class="badge badge-tech">Tecnico</span></td>
+                <td data-label="Durata">12 mesi</td>
+                <td data-label="Finalità">Salva la tua scelta sul banner cookie per non riproporglielo (cookie + localStorage).</td>
+              </tr>
+            </tbody>
+          </table></div>
+
+          <div class="note-box" style="margin-top:16px;">
+            ℹ️ Tutti i dati sono salvati localmente nel tuo browser tramite <strong>localStorage</strong> e non vengono trasmessi a terzi. L'unico dato inviato al server è l'<strong>email</strong> e le <strong>risposte al quiz</strong> al momento dell'invio del modulo.
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-num">3</div>
+        <div class="sec-body">
+          <div class="sec-title">Come gestire i Cookie</div>
+          <p class="sec-text">Puoi controllare o eliminare i cookie e il localStorage dal tuo browser. Eliminarli non impedisce la partecipazione al quiz, ma potrebbe richiedere di reinserire l'email se torni indietro tra le pagine.</p>
+          <div class="dot-list">
+            <div class="dot-item"><div class="dot"></div><span class="dot-text"><a href="https://support.google.com/chrome/answer/95647" target="_blank" rel="noopener noreferrer" style="color:#c0392b;">Chrome</a></span></div>
+            <div class="dot-item"><div class="dot"></div><span class="dot-text"><a href="https://support.mozilla.org/it/kb/protezione-antitracciamento" target="_blank" rel="noopener noreferrer" style="color:#c0392b;">Firefox</a></span></div>
+            <div class="dot-item"><div class="dot"></div><span class="dot-text"><a href="https://support.apple.com/it-it/guide/safari/sfri11471/mac" target="_blank" rel="noopener noreferrer" style="color:#c0392b;">Safari</a></span></div>
+          </div>
+          <div style="margin-top:16px; text-align:center;">
+            <button id="reset-consent" style="background:transparent; border:1px solid #c0392b; color:#c0392b; border-radius:8px; padding:8px 20px; font-family:'DM Sans',sans-serif; font-size:13px; cursor:pointer;">
+              🔄 Modifica preferenze cookie
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /panel-cookie -->
+
+  <!-- ═══════════════════════════════════════
+       TAB 3 — TERMINI E CONDIZIONI
+  ════════════════════════════════════════ -->
+  <div class="tab-panel" id="panel-termini">
+    <div class="card">
+      <div class="card-title">Termini e Condizioni</div>
+      <div class="card-sub">Iniziativa promozionale PuccioQuiz — Pucciotto srls</div>
+      <div class="intro"><strong>Leggere prima di partecipare.</strong> Partecipando al quiz dichiari di aver letto e accettato i presenti Termini e Condizioni.</div>
+
+      <div class="section">
+        <div class="sec-num">1</div>
+        <div class="sec-body">
+          <div class="sec-title">Organizzatore</div>
+          <p class="sec-text"><strong>Pucciotto srls</strong>, Via dei Biccari 15, Lecce (LE) 73100 — <strong>pucciottolecce@gmail.com</strong>. L'iniziativa PuccioQuiz è una promozione digitale organizzata in occasione dell'apertura del locale.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-num">2</div>
+        <div class="sec-body">
+          <div class="sec-title">Natura dell'Iniziativa</div>
+          <p class="sec-text"><strong>PuccioQuiz non è un concorso a premi</strong> ai sensi del D.P.R. 430/2001. Si tratta di un'iniziativa promozionale a premi certi: ogni partecipante idoneo riceve un gadget o prodotto di valore equivalente, distribuito all'apertura del locale.</p>
+          <div class="dot-list">
+            <div class="dot-item"><div class="dot"></div><span class="dot-text">La ruota assegna gadget e prodotti Pucciotto di valore equivalente tra loro. Non è prevista alcuna estrazione casuale con vincitori e perdenti.</span></div>
+            <div class="dot-item"><div class="dot"></div><span class="dot-text">Il premio è ritirato <strong>esclusivamente in sede</strong> al momento dell'apertura, presentando il token ricevuto via email.</span></div>
+            <div class="dot-item"><div class="dot"></div><span class="dot-text">Il token è <strong>nominale e non cedibile</strong>. Ogni email può partecipare una sola volta.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-num">3</div>
+        <div class="sec-body">
+          <div class="sec-title">Requisiti di Partecipazione</div>
+          <div class="dot-list">
+            <div class="dot-item"><div class="dot"></div><span class="dot-text">Essere maggiorenni (18+ anni).</span></div>
+            <div class="dot-item"><div class="dot"></div><span class="dot-text">Inserire un indirizzo email valido e funzionante.</span></div>
+            <div class="dot-item"><div class="dot"></div><span class="dot-text">Rispondere correttamente a tutte e 9 le domande obbligatorie del quiz.</span></div>
+            <div class="dot-item"><div class="dot"></div><span class="dot-text">Accettare il trattamento dei dati personali come da questa informativa.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-num">4</div>
+        <div class="sec-body">
+          <div class="sec-title">Validità e Scadenza</div>
+          <p class="sec-text">L'iniziativa è attiva fino alla data di apertura del locale Pucciotto a Lecce. Il token ricevuto via email è valido <strong>esclusivamente il giorno dell'apertura</strong> e non può essere utilizzato in date successive. Pucciotto srls si riserva il diritto di modificare o interrompere l'iniziativa dandone comunicazione via email agli iscritti.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-num">5</div>
+        <div class="sec-body">
+          <div class="sec-title">Limitazione di Responsabilità</div>
+          <p class="sec-text">Pucciotto srls non è responsabile per problemi tecnici che impediscano la ricezione dell'email con il token (filtri spam, casella piena, errore di digitazione dell'indirizzo). In caso di mancata ricezione contattaci a <strong>pucciottolecce@gmail.com</strong> entro la data di apertura.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-num">6</div>
+        <div class="sec-body">
+          <div class="sec-title">Foro Competente e Legge Applicabile</div>
+          <p class="sec-text">L'iniziativa è regolata dalla <strong>legge italiana</strong>. Per qualsiasi controversia è competente il Foro di <strong>Lecce</strong>, salvo diversa previsione inderogabile per i consumatori (art. 66-bis Codice del Consumo).</p>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /panel-termini -->
+
+  <!-- BACK BUTTON -->
+  <div class="btn-wrap">
+    <button class="back-btn" id="backBtn" type="button">← Torna al quiz</button>
+  </div>
+  <div class="update-note">Ultimo aggiornamento: Maggio 2025 · Pucciotto srls · P.IVA 05465530755</div>
+
+</div><!-- /wrap -->
+
+<script>
+// ─── TAB SWITCHING ────────────────────────────────────────────────────────────
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach(b => { b.classList.remove("active"); b.setAttribute("aria-selected","false"); });
+    document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+    btn.classList.add("active");
+    btn.setAttribute("aria-selected","true");
+    document.getElementById("panel-" + btn.dataset.tab).classList.add("active");
+  });
+});
+
+// ─── COOKIE BANNER ────────────────────────────────────────────────────────────
+const CONSENT_KEY = "pucciotto_cookie_consent";
+const banner      = document.getElementById("cookie-banner");
+
+function showBanner() { banner.classList.remove("hidden"); }
+function hideBanner()  { banner.classList.add("hidden"); }
+
+function saveConsent(value) {
+  try {
+    const expires = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString();
+    document.cookie = `${CONSENT_KEY}=${value}; expires=${expires}; path=/; SameSite=Lax`;
+    localStorage.setItem(CONSENT_KEY, value);
+  } catch {}
+  hideBanner();
+}
+
+function getConsent() {
+  try {
+    const fromLS = localStorage.getItem(CONSENT_KEY);
+    if (fromLS) return fromLS;
+    const match = document.cookie.match(new RegExp("(?:^|; )" + CONSENT_KEY + "=([^;]*)"));
+    return match ? match[1] : null;
+  } catch { return null; }
+}
+
+if (!getConsent()) { setTimeout(showBanner, 600); }
+
+document.getElementById("btn-cookie-accept").addEventListener("click", () => saveConsent("accepted"));
+document.getElementById("btn-cookie-reject").addEventListener("click", () => saveConsent("essential_only"));
+
+document.getElementById("banner-details-link").addEventListener("click", (e) => {
+  e.preventDefault();
+  document.querySelector('[data-tab="cookie"]').click();
+  hideBanner();
+});
+
+document.getElementById("reset-consent").addEventListener("click", () => {
+  try { localStorage.removeItem(CONSENT_KEY); } catch {}
+  document.cookie = `${CONSENT_KEY}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+  setTimeout(showBanner, 100);
+});
+
+// ─── TORNA AL QUIZ ────────────────────────────────────────────────────────────
+document.getElementById("backBtn").addEventListener("click", function() {
+  if (window.history.length > 1) window.history.back();
+  else window.location.href = "index.html";
+});
+</script>
+</body>
+</html>

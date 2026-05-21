@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>PuccioQuiz — Fine</title>
+  <meta name="theme-color" content="#c0392b">
+  <link rel="icon" type="image/svg+xml" href="logol.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lobster&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --cream: #faf8f5;
+      --white: #ffffff;
+      --black: #1a1a1a;
+      --red:   #c0392b;
+      --red2:  #a93226;
+      --border: #e8e4e0;
+      --muted: #999;
+    }
+
+    html, body {
+      min-height: 100%;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--black);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 28px 16px;
+    }
+
+    .card{
+      width: min(520px, 100%);
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+      padding: 40px 28px 28px;
+      text-align: center;
+    }
+
+    .logo{
+      width: 84px; height: 84px;
+      border-radius: 50%;
+      background: var(--cream);
+      border: 1.5px solid var(--border);
+      display:flex; align-items:center; justify-content:center;
+      margin: 0 auto 18px;
+      overflow:hidden;
+      padding: 10px;
+    }
+    .logo img{ width: 80%; height: 80%; object-fit: contain; display:block; }
+
+    h1{
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1.15;
+      margin-bottom: 10px;
+    }
+    p{
+      font-size: 14.5px;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-bottom: 0;
+    }
+
+    .actions{
+      margin-top: 22px;
+      display:flex;
+      gap: 10px;
+      justify-content:center;
+      flex-wrap: wrap;
+    }
+    button{
+      padding: 12px 18px;
+      border-radius: 14px;
+      border: 1.5px solid transparent;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.14s ease, background 0.14s ease;
+    }
+    button:hover{ transform: translateY(-1px); }
+    .primary{
+      background: var(--red);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(192,57,43,0.28);
+    }
+    .primary:hover{ background: var(--red2); }
+    .secondary{
+      background: var(--cream);
+      color: var(--muted);
+      border-color: var(--border);
+    }
+
+    .small{
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--muted);
+      opacity: 0.8;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+  <div class="card" role="main" aria-label="Fine gioco">
+    <div class="logo" aria-hidden="true">
+      <img src="logol.svg" alt="" onerror="this.src='logol.png'">
+    </div>
+
+    <h1>Grazie per aver partecipato</h1>
+    <p>L'iniziativa promozionale è terminata. Se questa pagina non si chiude automaticamente, puoi uscire con il pulsante qui sotto.</p>
+
+    <div class="actions">
+      <button id="closeBtn" class="primary" type="button">Chiudi</button>
+      <button id="backBtn" class="secondary" type="button">Torna all'inizio</button>
+    </div>
+    <div class="small" id="hint"></div>
+  </div>
+
+  <script>
+    (function(){
+      function getExitFromQuery(){
+        const params = new URLSearchParams(window.location.search);
+        const v = params.get('exit');
+        try { return v ? decodeURIComponent(v) : 'about:blank'; }
+        catch(_) { return 'about:blank'; }
+      }
+
+      const exitUrl = getExitFromQuery();
+      const hint = document.getElementById('hint');
+      hint.textContent = exitUrl && exitUrl !== 'about:blank' ? ('Uscita: ' + exitUrl) : '';
+
+      function attemptClose(){
+        try { window.close(); } catch(_) {}
+        setTimeout(() => { window.location.href = exitUrl || 'about:blank'; }, 250);
+      }
+
+      document.getElementById('closeBtn').addEventListener('click', attemptClose);
+      document.getElementById('backBtn').addEventListener('click', () => {
+        window.location.href = 'index.html';
+      });
+
+      setTimeout(attemptClose, 3000);
+    })();
+  </script>
+</body>
+</html>
