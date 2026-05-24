@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; script-src 'self' 'unsafe-inline'; connect-src *;">
+    <meta name="puccio-api-base" content="" />
+    <meta name="puccio-api-port" content="" />
+    <meta name="puccio-backend" content="__BACKEND_ORIGIN__" />
+    <meta name="puccio-exit-url" content="about:blank" />
+    <title>PuccioQuiz — Ruota della Fortuna</title>
+    <meta name="theme-color" content="#c0392b">
+    <link rel="icon" type="image/svg+xml" href="logol.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --cream:  #faf8f5;
+            --white:  #ffffff;
+            --black:  #1a1a1a;
+            --red:    #c0392b;
+            --red2:   #a93226;
+            --border: #e8e4e0;
+            --muted:  #999;
+            --green:         #4a7a40;
+            --green-bg:      #f3faf0;
+            --green-border:  rgba(80,160,60,0.2);
+        }
+
+        html, body {
+            min-height: 100%;
+            font-family: 'DM Sans', sans-serif;
+            background: var(--cream);
+            color: var(--black);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+            padding-left: max(16px, env(safe-area-inset-left));
+            padding-right: max(16px, env(safe-area-inset-right));
+        }
+
+        /* ── HEADER ── */
+        .logo-wrap {
+            display: flex; flex-direction: column; align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+            animation: fadeDown 0.45s ease both;
+        }
+        .logo-wrap svg { width: 110px; height: auto; display: block; }
+        .quiz-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: var(--red); color: #fff;
+            font-size: 9px; font-weight: 700; letter-spacing: 0.14em;
+            text-transform: uppercase; padding: 3px 9px;
+            border-radius: 50px; width: fit-content;
+        }
+
+        /* ── CARD ── */
+        .card {
+            width: 100%; max-width: 520px;
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            border-radius: 20px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+            padding: 14px 14px 18px;
+            animation: fadeUp 0.45s 0.08s ease both;
+        }
+
+        .card-title {
+            font-family: 'Lobster', cursive;
+            font-size: 22px; color: var(--black);
+            margin-bottom: 2px; text-align: center;
+        }
+        .card-title span { color: var(--red); }
+        .card-subtitle {
+            font-size: 12px; color: var(--muted);
+            line-height: 1.45; margin-bottom: 10px; text-align: center;
+        }
+
+        /* ── DISCLAIMER ── */
+        .disclaimer {
+            padding: 7px 10px; border-radius: 9px;
+            background: var(--green-bg); border: 1.5px solid var(--green-border);
+            display: flex; gap: 7px; align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        .disclaimer p { font-size: 10.5px; color: var(--green); line-height: 1.4; margin: 0; }
+        .disclaimer strong { color: #3a6830; }
+
+        /* ── WHEEL ── */
+        .wheel-section {
+            display: flex; flex-direction: column; align-items: center; gap: 14px;
+        }
+
+        .wheel-outer {
+            width: min(320px, 84vw);
+            height: min(320px, 84vw);
+            position: relative;
+        }
+
+        .wheel-outer::before {
+            content: '';
+            position: absolute; inset: -8px; border-radius: 50%;
+            background: conic-gradient(
+                rgba(192,57,43,0.07) 0deg, rgba(232,228,224,0.5) 90deg,
+                rgba(192,57,43,0.07) 180deg, rgba(232,228,224,0.5) 270deg,
+                rgba(192,57,43,0.07) 360deg
+            );
+            border: 1.5px solid var(--border);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+        }
+
+        .wheel-wrapper {
+            position: relative; width: 100%; height: 100%;
+            border-radius: 50%; border: 4px solid var(--border); overflow: visible;
+            box-shadow: 0 8px 32px rgba(192,57,43,0.12), 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        /* Pointer — nero */
+        .pointer {
+            position: absolute; top: -18px; left: 50%;
+            transform: translateX(-50%);
+            width: 0; height: 0;
+            border-left: 13px solid transparent;
+            border-right: 13px solid transparent;
+            border-top: 30px solid #1a1a1a;
+            z-index: 10;
+            filter: drop-shadow(0 3px 5px rgba(0,0,0,0.3));
+        }
+        .pointer::after {
+            content: '';
+            position: absolute; top: -34px; left: -7px;
+            width: 14px; height: 7px; border-radius: 50%;
+            background: #333;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        }
+
+        canvas {
+            width: 100%; height: 100%; border-radius: 50%;
+            transition: transform 6s cubic-bezier(0.15, 0.85, 0.15, 1);
+            will-change: transform;
+        }
+
+        .logo-center {
+            position: absolute; top: 50%; left: 50%;
+            width: 76px; height: 76px;
+            margin-top: -38px; margin-left: -38px;
+            z-index: 9; display: flex; align-items: center; justify-content: center;
+            overflow: hidden; padding: 5px;
+            background: var(--white); border-radius: 50%;
+            border: 2px solid var(--border);
+            box-shadow: 0 0 0 3px rgba(192,57,43,0.08), 0 4px 16px rgba(0,0,0,0.12);
+            transition: transform 6s cubic-bezier(0.15, 0.85, 0.15, 1);
+            will-change: transform;
+        }
+        .logo-center img { width: 78%; height: 78%; object-fit: contain; }
+
+        /* ── SPIN BUTTON ── */
+        .spin-btn {
+            display: flex; align-items: center; gap: 8px;
+            background: var(--red); color: #fff;
+            border: none; padding: 14px 32px;
+            min-height: 50px; border-radius: 14px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px; font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(192,57,43,0.28);
+            transition: background 0.18s ease, transform 0.18s ease;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .spin-btn:hover:not(:disabled) { background: var(--red2); transform: translateY(-1px); }
+        .spin-btn:active:not(:disabled) { transform: translateY(0); }
+        .spin-btn:disabled {
+            background: var(--border); color: var(--muted);
+            cursor: not-allowed; box-shadow: none; transform: none;
+        }
+
+        /* ── MODAL ── */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.55);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 100; opacity: 0; pointer-events: none;
+            transition: opacity 0.25s ease; padding: 20px;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+
+        .modal-content {
+            background: var(--white); border: 1.5px solid var(--border);
+            border-radius: 20px; padding: 30px 24px;
+            max-width: 420px; width: 100%; text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+            transform: scale(0.92) translateY(10px);
+            transition: transform 0.25s cubic-bezier(0.16,1,0.3,1);
+        }
+        .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+
+        .modal-title { font-family: 'Lobster', cursive; font-size: 26px; color: var(--black); margin: 0 0 12px; }
+        .modal-title.win { color: var(--red); }
+
+        .modal-text { font-size: 14px; line-height: 1.65; color: var(--muted); margin-bottom: 10px; }
+        .modal-text strong { color: var(--black); font-size: 1.05em; }
+
+        .modal-prize-badge {
+            display: inline-block; margin: 10px 0;
+            padding: 8px 20px; border-radius: 50px;
+            background: #fff5f4; border: 1.5px solid rgba(192,57,43,0.2);
+            color: var(--red); font-weight: 700; font-size: 17px;
+        }
+
+        .modal-btns {
+            display: flex; gap: 9px; justify-content: center;
+            flex-wrap: wrap; margin-top: 22px;
+        }
+        .modal-btns button {
+            border: none; border-radius: 12px; padding: 13px 22px;
+            font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 15px;
+            cursor: pointer; min-height: 48px;
+            transition: transform 0.12s;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .modal-btns button:hover { transform: translateY(-1px); }
+
+        #closeModalBtn { background: var(--red); color: #fff; box-shadow: 0 4px 14px rgba(192,57,43,0.22); }
+        #closeModalBtn:hover { background: var(--red2); }
+        #exitBtn { background: var(--cream); color: var(--muted); border: 1.5px solid var(--border); }
+        #exitBtn:hover { background: var(--border); }
+
+        @keyframes fadeDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes fadeUp   { from { opacity:0; transform:translateY(12px);  } to { opacity:1; transform:translateY(0); } }
+
+        @media (max-width: 480px) {
+            body { padding-top: 12px; }
+            .card { padding: 12px 12px 16px; border-radius: 16px; }
+            .card-title { font-size: 20px; }
+            .wheel-outer { width: 86vw; height: 86vw; }
+            .logo-center { width: 62px; height: 62px; margin-top: -31px; margin-left: -31px; }
+            .spin-btn { font-size: 15px; padding: 13px 26px; }
+            .modal-content { padding: 20px 14px; }
+        }
+
+        @media (max-width: 340px) {
+            .wheel-outer { width: 88vw; height: 88vw; }
+            .logo-center { width: 52px; height: 52px; margin-top: -26px; margin-left: -26px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="logo-wrap">
+        <svg width="906" height="622" viewBox="224 495 906 622" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Nudo logo">
+            <path d="M385.467 556.066C384.933 556.466 380.133 557.399 374.8 558.066C369.333 558.866 362 559.932 358.267 560.599C354.667 561.266 348 562.466 343.6 563.132C328.933 565.666 304.4 573.932 287.6 582.066C250.667 599.932 233.6 619.399 254.667 619.399C260 619.399 278.933 613.666 305.6 603.932C311.067 601.932 318 599.799 320.933 599.132C323.867 598.466 328.4 597.399 330.933 596.866C333.467 596.199 338.933 594.999 342.933 594.066C346.933 593.132 352.667 591.932 355.6 591.266C367.867 588.332 378.133 587.132 397.6 586.332C424.667 584.999 465.467 587.266 478.933 590.732C480.8 591.132 484.933 592.199 488.267 592.866C512.8 598.332 525.6 603.799 537.333 613.666C545.467 620.732 548.267 626.332 548.267 636.332C548.267 657.266 524 677.132 482.933 689.799C470.667 693.532 449.467 699.266 442.267 700.599C437.867 701.532 431.867 702.732 428.8 703.399C425.733 704.066 419.333 704.999 414.4 705.532L405.333 706.466L406.4 695.266C406.8 689.132 407.867 682.732 408.4 680.999C409.067 679.266 409.6 670.866 409.6 662.332C409.467 640.466 405.867 632.999 393.867 630.599C383.2 628.466 378.933 641.132 375.6 683.932C374 702.866 373.067 709.799 371.467 711.532C370.133 712.999 366.667 714.066 361.867 714.466C357.733 714.866 349.2 715.799 342.933 716.599C336.667 717.266 325.6 718.599 318.267 719.399C265.867 725.532 254.267 727.799 249.733 733.132C248.4 734.866 248.667 735.532 251.467 737.399C258.533 742.066 286.4 741.266 359.333 734.199C369.2 733.266 369.867 733.399 370.933 735.932C371.467 737.532 372.267 750.466 372.667 764.732C373.333 784.332 374.133 793.266 376.133 801.132C379.6 814.332 380.933 816.732 384.933 816.732C392.4 816.732 397.867 794.466 401.733 748.732C402.533 738.866 403.733 729.932 404.533 728.999C405.333 728.199 407.733 727.399 410 727.399C412.267 727.399 417.733 726.732 422.133 725.932C426.667 725.132 433.333 723.932 436.933 723.399C451.333 720.732 481.467 713.666 490.8 710.599C496.133 708.866 501.467 707.399 502.533 707.399C504.267 707.399 510.267 704.866 526.933 696.999C541.867 689.932 561.6 673.932 568.667 662.866C573.6 655.399 576.267 644.732 576.267 632.866C576.267 622.999 575.733 620.332 572.4 613.132C566.267 600.332 555.467 590.599 536.533 580.999C528 576.599 518 572.199 514.267 570.999C500.133 566.732 488.8 563.666 484.267 562.732C475.333 560.999 463.467 559.132 453.6 557.932C441.733 556.332 386.667 554.866 385.467 556.066Z" fill="#c0392b"/>
+            <path d="M952.4 642.199C947.867 643.932 946.133 646.866 944.267 655.399C943.333 659.399 942 663.532 941.333 664.332C940.533 665.266 937.067 666.066 933.467 666.066C924.8 666.066 919.333 671.132 922.667 676.199C924.4 678.732 929.333 680.732 934 680.732C941.6 680.732 941.867 681.666 940.133 707.532C938.4 732.999 939.2 761.666 941.733 772.066C947.467 795.532 961.067 800.466 978.667 785.399C981.733 782.599 985.867 777.532 987.733 773.932C989.467 770.332 991.733 767.399 992.667 767.399C993.6 767.399 995.2 770.466 996.133 774.199C1001.73 795.932 1016.8 800.199 1032.93 784.599C1036.67 780.999 1041.6 774.199 1044.13 769.399C1046.67 764.599 1049.07 760.732 1049.6 760.732C1050 760.732 1052.53 762.866 1055.07 765.532C1062.8 773.532 1067.47 775.799 1078.13 776.199C1092.27 776.866 1096.8 775.132 1106.27 765.532C1116.8 754.999 1120.27 746.332 1120.27 730.999C1120.27 717.132 1116.4 705.532 1109.2 697.132C1101.6 688.599 1095.73 686.066 1083.87 686.066C1075.47 686.066 1073.33 686.599 1068.13 689.799C1058.27 696.066 1053.2 704.332 1044.93 727.799C1040.93 739.266 1028 764.866 1024.93 767.399C1023.87 768.199 1022.53 768.599 1021.73 768.199C1019.33 766.732 1018.8 748.199 1020.13 720.732C1022.27 679.399 1022.27 679.399 1033.87 679.399C1040.8 679.399 1045.6 676.199 1045.6 671.532C1045.6 668.199 1044 667.132 1034.27 664.732L1026.27 662.599L1025.6 655.266C1025.2 651.132 1024.13 646.866 1023.2 645.799C1018.27 639.799 1006 639.932 1001.33 646.066C1000 647.932 998.533 652.599 998 656.466C997.067 664.999 995.333 666.599 988.267 665.532C985.333 665.132 980.533 664.332 977.6 663.932L972.267 663.132V656.466C972.267 648.199 970.533 644.999 964.933 642.599C959.733 640.466 956.933 640.332 952.4 642.199ZM994.133 681.799C996 682.866 994 717.799 991.6 726.066C987.733 738.999 972.667 767.799 969.2 768.466C966.933 768.866 965.867 765.532 964.8 754.466C963.867 744.466 967.867 685.399 969.733 681.932C971.067 679.399 971.867 679.266 982 680.066C988 680.599 993.467 681.399 994.133 681.799ZM1087.6 702.066C1088.67 702.066 1090.8 705.532 1092.4 709.666C1096.27 719.532 1096.8 744.999 1093.33 752.999C1089.07 762.599 1080.53 760.199 1075.73 747.932C1069.2 731.132 1075.07 698.199 1084 701.399C1085.07 701.799 1086.67 702.066 1087.6 702.066Z" fill="#c0392b"/>
+            <path d="M820 647.266C808.4 649.666 799.067 660.066 801.067 668.466C803.067 676.732 810.4 680.732 823.6 680.732C837.733 680.732 852.267 671.666 852.267 662.999C852.267 657.932 849.2 652.332 844.8 649.399C840.667 646.732 827.733 645.666 820 647.266Z" fill="#c0392b"/>
+            <path d="M685.6 682.999C683.067 683.399 678.933 685.132 676.4 686.999C670.267 691.666 661.067 706.466 658.4 716.066C652 738.332 650.533 742.466 645.067 754.066C640.267 763.799 638.133 766.599 635.867 765.666C632 764.199 631.6 738.732 635.067 717.932C636.667 708.199 635.2 704.066 628.8 701.399C622.933 698.999 614.933 698.732 612 700.999C610.8 701.932 608.267 708.066 606.267 714.732C601.6 730.999 591.067 760.732 588.8 764.332C587.733 766.066 586 767.399 584.8 767.399C583.2 767.399 582.933 765.266 583.733 752.999C584.133 745.132 584.8 737.799 585.2 736.732C585.6 735.666 586.4 729.266 586.933 722.732C587.6 716.066 588.4 707.666 588.933 703.799C590.4 693.932 589.2 690.466 583.867 688.999C575.067 686.599 566.133 689.266 562.4 695.532C559.867 699.799 557.333 728.866 557.067 757.399C556.933 771.932 557.2 773.932 560.267 780.066C562.8 785.132 564.933 787.399 569.867 789.799C579.067 794.599 585.2 793.132 592.267 784.732C595.333 781.132 599.067 774.732 600.8 770.466C604.4 761.666 606.267 760.332 607.333 765.666C608.4 770.866 615.467 780.332 620.667 783.399C626.667 787.132 636 786.866 641.6 782.999C644 781.399 647.867 777.266 650.133 773.799C652.4 770.332 654.933 767.532 655.6 767.532C656.4 767.532 658.8 770.199 660.933 773.399C666 781.132 672.4 785.399 681.6 787.399C695.067 790.199 711.333 783.399 722.667 770.066C725.867 766.466 729.067 763.399 730 763.399C730.933 763.399 732.667 765.799 734.133 768.599C740.933 782.866 754.933 790.466 769.467 787.799C781.467 785.532 788.667 781.399 798.267 771.266C807.2 761.666 809.6 760.332 809.6 764.599C809.6 766.066 810.267 767.666 810.933 768.066C811.733 768.466 812.267 769.932 812.267 770.999C812.267 774.199 817.6 781.532 821.733 783.932C823.733 785.132 827.867 786.066 830.8 786.066C840.933 786.066 848.533 780.199 855.333 767.399C856.8 764.866 858.267 762.332 858.8 761.799C859.333 761.266 863.333 764.066 867.867 767.932C875.733 774.732 876.533 775.132 885.467 776.066C902.933 777.799 913.867 772.466 923.6 757.532C936.267 738.199 931.6 705.132 914.4 692.332C907.6 687.399 903.333 686.066 893.2 686.066C884.133 686.066 883.2 686.332 877.067 691.132C868.4 697.666 862.4 706.732 858.8 718.466C850.8 744.599 842.8 763.932 839.333 765.266C834.8 766.999 833.6 763.666 833.6 748.866C833.6 741.132 834.267 730.866 834.933 726.066C838.133 705.532 838.133 704.199 834.667 700.199C831.867 696.866 830.4 696.466 823.733 696.199C816.667 696.066 815.733 696.332 812.8 700.066C810.133 703.399 809.6 705.532 809.6 712.999C809.6 724.466 805.6 734.332 794.4 751.132C787.733 761.132 778.533 769.399 772.533 770.999C767.6 772.199 762.667 769.932 759.333 764.866C756.8 761.132 756.267 758.599 756.267 750.199C756.267 744.599 757.2 735.799 758.4 730.732C759.467 725.532 760.933 719.266 761.467 716.732C762.933 710.199 766.133 702.999 768.533 700.999C772.933 697.399 773.467 701.799 771.333 720.466C770.267 730.199 769.733 738.999 770.133 740.066C771.067 742.466 778.4 742.599 782.4 740.332C784 739.399 786.8 736.866 788.8 734.599C792 730.732 792.267 729.399 792.267 718.332C792.267 707.932 791.733 705.132 788.4 697.666C783.333 686.199 778.8 683.399 765.867 683.399H756.4L750 689.932C744 696.066 739.6 703.799 734.267 718.066C729.6 730.732 720.133 748.866 714.4 756.332C708.4 764.332 698 771.399 692.533 771.399C691.067 771.399 688 769.932 685.867 768.066C680.8 763.799 678 751.932 680.133 743.932C680.933 741.132 681.6 736.732 681.6 734.199C681.6 729.932 682.4 725.932 686 713.399C687.867 706.732 691.2 700.466 693.333 699.666C696.267 698.732 696.8 703.799 695.067 720.999C693.2 740.332 693.6 742.066 700.8 742.066C710.8 742.066 715.2 734.466 715.067 716.866C715.067 709.932 714.4 703.666 713.6 702.866C712.933 702.199 712.267 700.332 712.267 698.999C712.267 695.132 708 688.866 703.6 686.066C699.067 683.266 692.4 682.199 685.6 682.999ZM899.733 703.532C903.067 706.199 904.933 717.666 904.933 734.332C904.933 749.399 904.667 751.666 902.133 754.999C893.333 766.866 883.467 752.466 883.733 728.066C883.867 709.532 888 699.666 894.933 701.399C896.667 701.932 898.933 702.866 899.733 703.532Z" fill="#c0392b"/>
+        </svg>
+        <span class="quiz-badge">🎡 Ruota della Fortuna</span>
+    </div>
+
+    <div class="card" role="main">
+
+        <div class="card-title">Gira la <span>Ruota</span></div>
+        <div class="card-subtitle" id="pageSubtitle">Hai risposto correttamente. Scopri il gadget o prodotto che ti aspetta all'apertura!</div>
+
+        <div class="disclaimer" role="note">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:2px" aria-hidden="true">
+                <circle cx="8" cy="8" r="7" stroke="#4a7a40" stroke-width="1.3" opacity="0.7"/>
+                <path d="M8 5v4M8 11v.5" stroke="#4a7a40" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+            <p><strong>Iniziativa promozionale, non un concorso a premi.</strong> I gadget e prodotti assegnati verranno distribuiti fisicamente all'apertura del locale tramite token.</p>
+        </div>
+
+        <div class="wheel-section">
+            <div class="wheel-outer">
+                <div class="wheel-wrapper">
+                    <div class="pointer" aria-hidden="true"></div>
+                    <canvas id="wheelCanvas" width="800" height="800" aria-label="Ruota della fortuna"></canvas>
+                    <div class="logo-center" id="logoCenterContainer" aria-hidden="true">
+                        <img src="logol.svg" alt="">
+                    </div>
+                </div>
+            </div>
+            <button class="spin-btn" id="spinBtn" aria-label="Gira la ruota">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                    <path d="M9 2a7 7 0 1 1-4.95 2.05" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M4 2h3v3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Gira Ora
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Modal risultati -->
+    <div class="modal-overlay" id="resultModal" aria-hidden="true">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <h2 class="modal-title" id="modalTitle">Risultato</h2>
+            <div id="modalBody"></div>
+            <div class="modal-btns">
+                <button id="closeModalBtn" type="button">Chiudi</button>
+                <button id="exitBtn" type="button">Esci</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // ── SAFE localStorage ──
+    function lsGet(key)      { try { return localStorage.getItem(key); }      catch(_) { return null; } }
+    function lsSet(key, val) { try { localStorage.setItem(key, val); }        catch(_) {} }
+    function lsRemove(key)   { try { localStorage.removeItem(key); }          catch(_) {} }
+
+    // ── SICUREZZA: escapeHtml ──
+    function escapeHtml(s) {
+        return String(s)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    // ── API BASE ──
+    function puccioApiBaseSync() {
+        if (typeof window.__PUCCIO_RESOLVED_API_BASE__ === 'string') return window.__PUCCIO_RESOLVED_API_BASE__;
+        if (typeof window.__PUCCIO_QUIZ_API__ === 'string' && window.__PUCCIO_QUIZ_API__.length)
+            return String(window.__PUCCIO_QUIZ_API__).replace(/\/$/, '');
+        const custom = document.querySelector('meta[name="puccio-api-base"]');
+        if (custom) { const u = (custom.getAttribute('content') || '').trim(); if (u) return u.replace(/\/$/, ''); }
+        const back = document.querySelector('meta[name="puccio-backend"]');
+        if (back) {
+            const o = (back.getAttribute('content') || '').trim();
+            if (o && o.indexOf('__') === -1) { if (o === window.location.origin) return ''; return o.replace(/\/$/, ''); }
+        }
+        return null;
+    }
+
+    async function resolvePuccioApiBase() {
+        const sync = puccioApiBaseSync();
+        if (sync !== null) { window.__PUCCIO_RESOLVED_API_BASE__ = sync; return sync; }
+        async function tryHealth(base) {
+            const origin = base === '' ? window.location.origin : base;
+            try {
+                const r = await fetch(origin + '/api/health', { method: 'GET', cache: 'no-store' });
+                if (!r.ok) return null;
+                const j = await r.json().catch(() => ({}));
+                if (j && j.service === 'puccioquiz-backend') return base;
+            } catch(e) {}
+            return null;
+        }
+        const h = window.location.hostname;
+        const isLocal = h === '127.0.0.1' || h === 'localhost' || h === '[::1]';
+        const portMeta = document.querySelector('meta[name="puccio-api-port"]');
+        const alt = (portMeta && (portMeta.getAttribute('content') || '').trim()) || '3000';
+        const list = [''];
+        if (isLocal) { list.push('http://127.0.0.1:' + alt); if (alt !== '3000') list.push('http://127.0.0.1:3000'); }
+        for (let i = 0; i < list.length; i++) {
+            const hit = await tryHealth(list[i]);
+            if (hit !== null) { window.__PUCCIO_RESOLVED_API_BASE__ = hit; return hit; }
+        }
+        if (window.location.protocol === 'file:') {
+            window.__PUCCIO_RESOLVED_API_BASE__ = 'http://127.0.0.1:' + alt;
+            return window.__PUCCIO_RESOLVED_API_BASE__;
+        }
+        window.__PUCCIO_RESOLVED_API_BASE__ = '';
+        return '';
+    }
+
+    // ── AUDIO ──
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playWinSound() {
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.frequency.setValueAtTime(800, now);
+        osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+        osc.start(now); osc.stop(now + 0.2);
+    }
+
+    function playSpinSound() {
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(150, now);
+        osc.frequency.linearRampToValueAtTime(250, now + 0.1);
+        osc.frequency.linearRampToValueAtTime(150, now + 0.2);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.setValueAtTime(0.15, now + 0.15);
+        gain.gain.exponentialRampToValueAtTime(0.05, now + 0.2);
+        osc.start(now); osc.stop(now + 0.2);
+    }
+
+    function playSpinningLoop(duration) {
+        const interval = 150; let elapsed = 0;
+        const id = setInterval(() => {
+            if (elapsed >= duration) {
+                clearInterval(id);
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.exponentialRampToValueAtTime(800, now + 0.1);
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                osc.start(now); osc.stop(now + 0.15);
+                return;
+            }
+            playSpinSound();
+            elapsed += interval;
+        }, interval);
+    }
+
+    // ── SLICES — palette chiara coerente con design system ──
+    const slicesConfig = [
+        { name:'Crocchettone', color:'#e8e0d5', textColor:'#8b2218' },
+        { name:'Portachiavi',  color:'#c0392b', textColor:'#ffffff' },
+        { name:'Crocchettone', color:'#e8e0d5', textColor:'#8b2218' },
+        { name:'Portachiavi',  color:'#c0392b', textColor:'#ffffff' },
+        { name:'Pucciotto',    color:'#1a1a1a', textColor:'#f0c97a' },
+        { name:'Crocchettone', color:'#e8e0d5', textColor:'#8b2218' },
+        { name:'Portachiavi',  color:'#c0392b', textColor:'#ffffff' },
+        { name:'Crocchettone', color:'#e8e0d5', textColor:'#8b2218' },
+        { name:'Portachiavi',  color:'#c0392b', textColor:'#ffffff' },
+        { name:'Crocchettone', color:'#e8e0d5', textColor:'#8b2218' },
+        { name:'Maglietta',    color:'#6b1a13', textColor:'#f0c97a' },
+        { name:'Pucciotto',    color:'#1a1a1a', textColor:'#f0c97a' },
+        { name:'Crocchettone', color:'#e8e0d5', textColor:'#8b2218' },
+        { name:'Portachiavi',  color:'#c0392b', textColor:'#ffffff' },
+        { name:'Crocchettone', color:'#e8e0d5', textColor:'#8b2218' },
+        { name:'Portachiavi',  color:'#c0392b', textColor:'#ffffff' },
+        { name:'Crocchettone', color:'#e8e0d5', textColor:'#8b2218' },
+        { name:'Portachiavi',  color:'#c0392b', textColor:'#ffffff' },
+        { name:'Crocchettone', color:'#e8e0d5', textColor:'#8b2218' },
+        { name:'Portachiavi',  color:'#c0392b', textColor:'#ffffff' },
+    ];
+
+    const totalSlices = slicesConfig.length;
+    const sliceAngle  = 360 / totalSlices;
+
+    const canvas              = document.getElementById('wheelCanvas');
+    const ctx                 = canvas.getContext('2d');
+    const spinBtn             = document.getElementById('spinBtn');
+    const resultModal         = document.getElementById('resultModal');
+    const modalTitle          = document.getElementById('modalTitle');
+    const modalBody           = document.getElementById('modalBody');
+    const closeModalBtn       = document.getElementById('closeModalBtn');
+    const exitBtn             = document.getElementById('exitBtn');
+    const logoCenterContainer = document.getElementById('logoCenterContainer');
+
+    let currentRotation = 0;
+    let isSpinning  = false;
+    let wheelLocked = false;
+
+    // ── FRONTEND ANTI-RESPIN FALLBACK ──
+    // Blocca ulteriori spin nella stessa sessione anche se il backend non risponde con 409.
+    // Complementare alla logica server (non la sostituisce).
+    const SPIN_DONE_KEY = 'puccioQuiz_spinDone';
+    function markSpinDone(prizeName) {
+        lsSet(SPIN_DONE_KEY, JSON.stringify({ prize: prizeName, ts: Date.now() }));
+    }
+    function wasSpinDone() {
+        try {
+            const raw = lsGet(SPIN_DONE_KEY);
+            if (!raw) return false;
+            const data = JSON.parse(raw);
+            // Valido per 24h come fallback
+            return data && data.ts && (Date.now() - data.ts < 86400000);
+        } catch(_) { return false; }
+    }
+
+    function lockWheelUi(buttonLabel) {
+        wheelLocked = true;
+        spinBtn.disabled = true;
+        if (buttonLabel) spinBtn.textContent = buttonLabel;
+    }
+
+    function getExitUrl() {
+        const meta = document.querySelector('meta[name="puccio-exit-url"]');
+        const u = meta ? (meta.getAttribute('content') || '').trim() : '';
+        return u || 'about:blank';
+    }
+
+    function clearSession() {
+        lsRemove('puccioQuiz_email');
+        lsRemove('puccioQuiz_q10');
+        lsRemove('puccioQuiz_missedList');
+        lsRemove(SPIN_DONE_KEY);
+    }
+
+    function tryExitPage() {
+        clearSession();
+        try { window.close(); } catch(_) {}
+        window.location.href = 'fine.html?exit=' + encodeURIComponent(getExitUrl());
+    }
+
+    async function bootstrapWheelPage() {
+        const email = (lsGet('puccioQuiz_email') || '').trim();
+        if (!email) { window.location.replace('test.html'); return; }
+
+        // Controllo fallback locale PRIMA della chiamata API
+        if (wasSpinDone()) {
+            lockWheelUi('Già utilizzata');
+            const subtitle = document.getElementById('pageSubtitle');
+            if (subtitle) subtitle.textContent = 'Hai già girato la ruota. Il token è stato inviato via email.';
+            return;
+        }
+
+        try {
+            const r = await fetch((await resolvePuccioApiBase()) + '/api/participation-state', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+            const j = await r.json().catch(() => ({}));
+            if (!r.ok) return;
+            if (!j.exists)     { window.location.replace('test.html');  return; }
+            if (!j.testPassed) { window.location.replace('perso.html'); return; }
+            if (j.wheelDone) {
+                lsSet(SPIN_DONE_KEY, JSON.stringify({ prize: j.prize_name || '', ts: Date.now() }));
+                lockWheelUi('Già utilizzata');
+                const subtitle = document.getElementById('pageSubtitle');
+                if (subtitle) {
+                    const prizeName = escapeHtml(String(j.prize_name || 'Gadget'));
+                    const until = j.prize_valid_until ? new Date(j.prize_valid_until).toLocaleString('it-IT') : '';
+                    subtitle.innerHTML =
+                        'Hai già girato la ruota con questa email.<br>' +
+                        '<strong style="color:var(--red);">' + prizeName + '</strong><br>' +
+                        '<span style="font-size:0.85rem;color:var(--muted);">Il token è stato inviato via email.</span>' +
+                        (until ? '<br><span style="font-size:0.85rem;color:var(--muted);">Valido fino al: ' + escapeHtml(until) + '</span>' : '');
+                }
+            }
+        } catch(_) {}
+    }
+
+    function drawWheel() {
+        const cx = canvas.width / 2, cy = canvas.height / 2, r = cx;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = 0; i < totalSlices; i++) {
+            const sa = (i * sliceAngle - 90) * (Math.PI / 180);
+            const ea = ((i + 1) * sliceAngle - 90) * (Math.PI / 180);
+
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.arc(cx, cy, r, sa, ea);
+            ctx.closePath();
+            ctx.fillStyle = slicesConfig[i].color;
+            ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = 'rgba(232,228,224,0.9)';
+            ctx.stroke();
+
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(sa + (sliceAngle / 2) * (Math.PI / 180));
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = slicesConfig[i].textColor;
+            // Font adattivo alla dimensione canvas
+            const fontSize = Math.max(14, Math.round(canvas.width * 0.028));
+            ctx.font = `bold ${fontSize}px 'DM Sans', sans-serif`;
+            ctx.fillText(slicesConfig[i].name, r - 40, 0);
+            ctx.restore();
+        }
+
+        // Centro bianco
+        ctx.beginPath();
+        ctx.arc(cx, cy, 65, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(232,228,224,1)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    }
+
+    function spinWheel() {
+        if (wheelLocked || isSpinning) return;
+        // Doppio check anti-respin locale
+        if (wasSpinDone()) { lockWheelUi('Già utilizzata'); return; }
+
+        isSpinning = true;
+        spinBtn.disabled = true;
+
+        // Risveglia AudioContext (richiede gesto utente — il click è il trigger)
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        playSpinningLoop(6000);
+
+        currentRotation = currentRotation + (360 - (currentRotation % 360));
+        const winningIndex    = Math.floor(Math.random() * totalSlices);
+        const sliceCenterDeg  = winningIndex * sliceAngle + (sliceAngle / 2);
+        const targetRotation  = currentRotation + 360 * 8 + (360 - sliceCenterDeg);
+        currentRotation = targetRotation;
+
+        canvas.style.transform              = `rotate(${currentRotation}deg)`;
+        logoCenterContainer.style.transform = `rotate(${currentRotation}deg)`;
+
+        canvas.addEventListener('transitionend', async function handler() {
+            canvas.removeEventListener('transitionend', handler);
+            try {
+                await showResult(slicesConfig[winningIndex].name);
+            } finally {
+                isSpinning = false;
+                spinBtn.disabled = false;
+            }
+        });
+    }
+
+    function renderPrizeModal(prizeName, prizeValidUntil, errMsg, errIsHtml) {
+        if (errMsg) {
+            modalTitle.textContent = 'Attenzione';
+            modalTitle.className = 'modal-title';
+            modalBody.innerHTML =
+                '<p class="modal-text">' + (errIsHtml ? String(errMsg) : escapeHtml(errMsg)) + '</p>' +
+                (prizeName ? '<p style="font-size:0.85rem;color:var(--muted);margin-top:8px;">Segmento: <strong>' + escapeHtml(prizeName) + '</strong></p>' : '');
+        } else {
+            modalTitle.textContent = 'Hai Vinto! 🎉';
+            modalTitle.className = 'modal-title win';
+            const until = prizeValidUntil ? new Date(prizeValidUntil).toLocaleString('it-IT') : '';
+            modalBody.innerHTML =
+                '<p class="modal-text">Complimenti! Il tuo gadget all\'apertura:</p>' +
+                '<div class="modal-prize-badge">' + escapeHtml(prizeName) + '</div>' +
+                '<p class="modal-text" style="margin-top:12px;">Ti abbiamo inviato il <strong>token via email</strong>. Controlla anche lo spam.</p>' +
+                (until ? '<p style="font-size:0.85rem;color:var(--muted);margin-top:4px;">Valido fino al: ' + escapeHtml(until) + '</p>' : '') +
+                '<p style="font-size:0.85rem;color:var(--muted);margin-top:8px;">Mostra il token alla cassa all\'apertura per ritirare il tuo gadget.</p>';
+        }
+        resultModal.classList.add('active');
+        resultModal.setAttribute('aria-hidden', 'false');
+    }
+
+    async function showResult(prizeName) {
+        playWinSound();
+        setTimeout(() => playWinSound(), 200);
+        setTimeout(() => playWinSound(), 400);
+
+        const email = (lsGet('puccioQuiz_email') || '').trim();
+        if (!email) {
+            renderPrizeModal(prizeName, '', 'Email non trovata. Torna al quiz e invia di nuovo il modulo.', false);
+            return;
+        }
+
+        // Salva subito il flag locale PRIMA di chiamare il server
+        // (se l'utente chiude la pagina durante la chiamata, non può rigirare)
+        markSpinDone(prizeName);
+
+        try {
+            const base = await resolvePuccioApiBase();
+            const r = await fetch(base + '/api/spin-result', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, prizeName })
+            });
+            const j = await r.json().catch(() => ({}));
+
+            if (r.status === 409) {
+                renderPrizeModal(prizeName, j.prize_valid_until || '', j.error || 'Hai già girato la ruota con questa email.', false);
+                lockWheelUi('Già utilizzata');
+                return;
+            }
+            if (!r.ok || !j.ok) {
+                const errText = (j && j.error) ? String(j.error) : ('Errore server (' + r.status + ')');
+                const extraHtml = escapeHtml(errText) +
+                    '<br><br><button id="resendBtn" style="margin-top:10px;font-size:14px;padding:12px 22px;min-height:44px;background:var(--red);color:#fff;border:none;border-radius:10px;cursor:pointer;font-weight:700;touch-action:manipulation;">Reinvia email</button>';
+                renderPrizeModal(prizeName, j.prize_valid_until || '', extraHtml, true);
+                setTimeout(() => {
+                    const btn = document.getElementById('resendBtn');
+                    if (!btn) return;
+                    btn.addEventListener('click', async () => {
+                        btn.disabled = true; btn.textContent = 'Invio…';
+                        try {
+                            const rr = await fetch((await resolvePuccioApiBase()) + '/api/resend-token', {
+                                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ email })
+                            });
+                            const jj = await rr.json().catch(() => ({}));
+                            if (!rr.ok || !jj.ok) throw new Error(jj.error || ('HTTP ' + rr.status));
+                            btn.textContent = 'Inviata! ✓';
+                        } catch(e) { btn.textContent = 'Errore: riprova'; btn.disabled = false; }
+                    });
+                }, 0);
+                return;
+            }
+            renderPrizeModal(prizeName, j.prize_valid_until, '', false);
+            lockWheelUi('Già utilizzata');
+        } catch(e) {
+            renderPrizeModal(prizeName, '', 'Connessione al server non riuscita.', false);
+        }
+    }
+
+    spinBtn.addEventListener('click', spinWheel);
+
+    closeModalBtn.addEventListener('click', () => {
+        resultModal.classList.remove('active');
+        resultModal.setAttribute('aria-hidden', 'true');
+    });
+
+    exitBtn.addEventListener('click', () => { tryExitPage(); });
+
+    // Chiudi modal cliccando overlay
+    resultModal.addEventListener('click', (e) => {
+        if (e.target === resultModal) {
+            resultModal.classList.remove('active');
+            resultModal.setAttribute('aria-hidden', 'true');
+        }
+    });
+
+    (async function initPage() {
+        await resolvePuccioApiBase().catch(() => {});
+        await bootstrapWheelPage();
+        drawWheel();
+    })();
+</script>
+</body>
+</html>
