@@ -277,8 +277,13 @@ async function sendWinnerEmail({ to, prizeName, token, prizeValidUntil, unsubscr
     </p>
     <hr style="border:none;border-top:1px solid #f0ece8;margin:24px 0 20px 0;"/>
     <p style="font-size:13px;font-weight:700;color:#1a1a1a;margin:0 0 6px 0;">Resta aggiornato sui nostri social</p>
-    <p style="font-size:13px;color:#777777;margin:0;line-height:1.6;">
-      Seguici per non perdere le novita, le promozioni e tutte le ultime news da Pucciotto. I link ai nostri canali arriveranno presto!
+    <p style="font-size:13px;color:#777777;margin:0 0 10px 0;line-height:1.6;">
+      Seguici per non perdere le novita, le promozioni e tutte le ultime news da Pucciotto!
+    </p>
+    <p style="margin:0;">
+      <a href="https://www.tiktok.com/@pucciotto_lecce" style="display:inline-block;margin-right:12px;color:#C0392B;text-decoration:none;font-size:13px;font-weight:700;">TikTok</a>
+      <a href="https://www.facebook.com/pucciottolecce/" style="display:inline-block;margin-right:12px;color:#C0392B;text-decoration:none;font-size:13px;font-weight:700;">Facebook</a>
+      <a href="https://www.instagram.com/pucciotto_lecce/" style="display:inline-block;color:#C0392B;text-decoration:none;font-size:13px;font-weight:700;">Instagram</a>
     </p>
   `;
 
@@ -313,8 +318,13 @@ async function sendLoserEmail({ to, unsubscribeToken }) {
         </div>
       </td></tr>
     </table>
-    <p style="font-size:13px;color:#777777;margin:0;line-height:1.6;">
-      Seguici sui nostri social per non perdere le promozioni e le ultime news da Pucciotto. I link ai nostri canali arriveranno presto!
+    <p style="font-size:13px;color:#777777;margin:0 0 10px 0;line-height:1.6;">
+      Seguici sui nostri social per non perdere le promozioni e le ultime news da Pucciotto!
+    </p>
+    <p style="margin:0;">
+      <a href="https://www.tiktok.com/@pucciotto_lecce" style="display:inline-block;margin-right:12px;color:#C0392B;text-decoration:none;font-size:13px;font-weight:700;">TikTok</a>
+      <a href="https://www.facebook.com/pucciottolecce/" style="display:inline-block;margin-right:12px;color:#C0392B;text-decoration:none;font-size:13px;font-weight:700;">Facebook</a>
+      <a href="https://www.instagram.com/pucciotto_lecce/" style="display:inline-block;color:#C0392B;text-decoration:none;font-size:13px;font-weight:700;">Instagram</a>
     </p>
   `;
 
